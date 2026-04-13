@@ -1,0 +1,115 @@
+import type { SessionSummary } from "../core/types.js";
+import { formatCO2 } from "../core/tone.js";
+
+interface ReportData {
+  title: string;
+  period: string;
+  totalCO2: number;
+  totalTokens: number;
+  totalSessions: number;
+  sessions: SessionSummary[];
+  dailyData: Array<{ date: string; co2: number }>;
+  modelBreakdown: Array<{ model: string; co2: number; tokens: number }>;
+}
+
+export function renderHTMLReport(data: ReportData): string {
+  const maxDailyCO2 = Math.max(...data.dailyData.map((d) => d.co2), 1);
+
+  const dailyBarsHTML = data.dailyData
+    .map((d) => {
+      const height = Math.max(2, (d.co2 / maxDailyCO2) * 150);
+      const color = d.co2 < 5 ? "#4ade80" : d.co2 < 20 ? "#facc15" : d.co2 < 50 ? "#c084fc" : "#f87171";
+      return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+        <div style="background:${color};width:28px;height:${height}px;border-radius:4px 4px 0 0"></div>
+        <span style="font-size:10px;color:#9ca3af">${d.date.slice(5)}</span>
+        <span style="font-size:10px;color:#d1d5db">${formatCO2(d.co2)}</span>
+      </div>`;
+    })
+    .join("\n");
+
+  const sessionRowsHTML = data.sessions
+    .slice(0, 50)
+    .map((s) => {
+      const co2Color = s.co2_grams < 5 ? "#4ade80" : s.co2_grams < 20 ? "#facc15" : "#f87171";
+      return `<tr>
+        <td style="padding:8px;color:#9ca3af">${s.id.slice(0, 7)}</td>
+        <td style="padding:8px">${s.timestamp.slice(0, 16).replace("T", " ")}</td>
+        <td style="padding:8px;color:#c084fc">${s.model.split("-").pop() ?? s.model}</td>
+        <td style="padding:8px;text-align:right">${s.total_tokens.toLocaleString()}</td>
+        <td style="padding:8px;text-align:right;color:${co2Color}">${formatCO2(s.co2_grams)}</td>
+      </tr>`;
+    })
+    .join("\n");
+
+  const searches = (data.totalCO2 / 0.2).toFixed(0);
+  const carKm = (data.totalCO2 / 120).toFixed(1);
+  const phoneCharges = (data.totalCO2 / 8).toFixed(1);
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${data.title}</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace; padding: 40px; max-width: 900px; margin: 0 auto; }
+  .card { background: #1e293b; border-radius: 12px; padding: 24px; margin-bottom: 24px; border: 1px solid #334155; }
+  h1 { font-size: 24px; margin-bottom: 8px; }
+  h2 { font-size: 18px; margin-bottom: 16px; color: #94a3b8; }
+  .stat { display: inline-block; margin-right: 32px; }
+  .stat-value { font-size: 28px; font-weight: bold; }
+  .stat-label { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+  .chart { display: flex; align-items: flex-end; gap: 8px; min-height: 180px; padding-top: 20px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 8px; color: #64748b; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid #334155; }
+  tr:hover { background: #334155; }
+  .comparison { display: flex; gap: 24px; flex-wrap: wrap; }
+  .comp-item { flex: 1; min-width: 150px; text-align: center; padding: 16px; background: #0f172a; border-radius: 8px; }
+  .comp-icon { font-size: 28px; }
+  .comp-value { font-size: 18px; font-weight: bold; margin: 8px 0; }
+  .comp-label { font-size: 12px; color: #64748b; }
+  .footer { text-align: center; color: #475569; font-size: 12px; margin-top: 40px; }
+</style>
+</head>
+<body>
+
+<h1>\u{1F4A8} co2de Carbon Footprint Report</h1>
+<h2>${data.period}</h2>
+
+<div class="card">
+  <div class="stat"><div class="stat-value">${formatCO2(data.totalCO2)}</div><div class="stat-label">Total CO2</div></div>
+  <div class="stat"><div class="stat-value">${data.totalSessions}</div><div class="stat-label">Sessions</div></div>
+  <div class="stat"><div class="stat-value">${(data.totalTokens / 1_000_000).toFixed(1)}M</div><div class="stat-label">Tokens</div></div>
+</div>
+
+<div class="card">
+  <h2>Daily Emissions</h2>
+  <div class="chart">${dailyBarsHTML}</div>
+</div>
+
+<div class="card">
+  <h2>Scale Comparison</h2>
+  <div class="comparison">
+    <div class="comp-item"><div class="comp-icon">\u{1F50D}</div><div class="comp-value">${searches}</div><div class="comp-label">Google Searches</div></div>
+    <div class="comp-item"><div class="comp-icon">\u{1F697}</div><div class="comp-value">${carKm} km</div><div class="comp-label">Car Driving</div></div>
+    <div class="comp-item"><div class="comp-icon">\u{1F4F1}</div><div class="comp-value">${phoneCharges}</div><div class="comp-label">Phone Charges</div></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Session Log</h2>
+  <table>
+    <thead><tr><th>ID</th><th>Time</th><th>Model</th><th>Tokens</th><th>CO2</th></tr></thead>
+    <tbody>${sessionRowsHTML}</tbody>
+  </table>
+</div>
+
+<div class="footer">
+  <p>Generated by co2de v0.1.0 | Coefficients are estimates</p>
+  <p>Sources: IEA 2023, Luccioni et al. 2023, EPA 2024</p>
+</div>
+
+</body>
+</html>`;
+}

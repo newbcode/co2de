@@ -1,0 +1,35 @@
+{
+  "name": "co2de",
+  "version": "0.1.0",
+  "description": "Track the carbon cost of vibe coding, one token at a time.",
+  "type": "module",
+  "bin": {
+    "co2de": "./dist/co2de.js"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "carbon",
+    "co2",
+    "cli",
+    "ai",
+    "vibe-coding",
+    "sustainability"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "commander": "^14.0.3",
+    "typescript": "^6.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "tsup": "^8.5.1",
+    "vitest": "^4.1.4"
+  }
+}
