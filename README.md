@@ -5,8 +5,8 @@
 <!-- co2de-badge:end -->
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/newbcode/co2de)](https://github.com/newbcode/co2de)
 [![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
 
 > Track the carbon cost of vibe coding, one token at a time.
 
@@ -58,9 +58,12 @@ co2de export
 
 ## Output Examples
 
-### `co2de` — Session Summary
+<details open>
+<summary><b><code>co2de</code></b> — Session Summary</summary>
 
-```
+```console
+$ co2de
+
   co2de — Carbon Tracker
 
   SESSION   opus        13.5M tok   1.60g      $5.40   1.1g/line written
@@ -72,9 +75,14 @@ co2de export
   Total this week: 3.55g across 8 sessions
 ```
 
-### `co2de usage` — Emission Ledger
+</details>
 
-```
+<details>
+<summary><b><code>co2de usage</code></b> — Emission Ledger</summary>
+
+```console
+$ co2de usage
+
   CO2 EMISSION LEDGER
   2026-04-07 → 2026-04-13
 
@@ -92,38 +100,140 @@ co2de export
   ···  nextjs-blog  — $28.17 · 3.55g · 8 ses
     1  Apr 13  opus        13.5M   ...   1.60g   88%  ████████████
     2  Apr 12  haiku        2.8M   ...   0.04g   91%  ▎░░░░░░░░░░░
+    3  Apr 11  sonnet       6.2M   ...   0.22g   93%  █▊░░░░░░░░░░
     ...
+
+  INSIGHTS
+  ● Heaviest session: nextjs-blog Apr 13 — 1.60g CO2
+  ● Avg per session: ~0.44g
 ```
 
-### `co2de why` — Calculation Breakdown
+</details>
 
-```
-  STEP 2: Energy Consumption
+<details>
+<summary><b><code>co2de why</code></b> — Calculation Breakdown</summary>
+
+```console
+$ co2de why
+
+💨 co2de — Why 1.60g CO2?
+
+STEP 1: Token Count
+  Input:        12,451 tokens (prompt, context)
+  Output:      285,320 tokens (model responses)
+  Cache R:  12,845,210 tokens (reused context)
+  Cache W:     412,019 tokens (new context)
+  Total:    13,555,000 tokens
+
+STEP 2: Energy Consumption
   Model: claude-opus-4-6 → 0.005 Wh/token
   Full-price tokens: 709,790 × 0.005 = 3548.95 Wh
   Cache-read tokens: 12,845,210 × 0.005 × 0.1 = 6422.61 Wh (90% discount)
+  PUE:   × 1.2 (datacenter overhead)
+  Total: 11965.87 Wh = 11.9659 kWh
 
-  REGIONAL IMPACT — Same tokens, different grids
+STEP 3: Carbon Emission
+  Region: us → 390 gCO2/kWh
+  CO2:    11.9659 × 390 = 1.60g CO2e
+
+REGIONAL IMPACT — Same tokens, different grids
   Your region (us)    ████████████▍░░░░░░░   1.60g   390 gCO2/kWh
   France (nuclear)    █▊░░░░░░░░░░░░░░░░░░   0.23g    55 gCO2/kWh  -86%
   Norway (hydro)      ▍░░░░░░░░░░░░░░░░░░░   0.04g    10 gCO2/kWh  -97%
   India (coal-heavy)  ████████████████████   2.59g   630 gCO2/kWh  +62%
 ```
 
-### `co2de savings` — Efficiency Report
+</details>
 
-```
+<details>
+<summary><b><code>co2de savings</code></b> — Efficiency Report</summary>
+
+```console
+$ co2de savings
+
+  CARBON SAVINGS  Past 7 Days
+
   ACTUAL    █████░░░░░░░░░░░░░░░  3.55g
   WORST     ████████████████████  15.12g (all-opus, no cache)
   SAVED     ███████████████░░░░░  11.57g (77%)
+
+  BREAKDOWN
+  Cache reuse          ██████████████  9.71g saved
+  Lighter models       ██████░░░░░░░░  1.86g saved
 
   Cache hit rate: 93% — higher = more savings
   Excellent efficiency.
 ```
 
-### `co2de export` — Carbon Receipt
+</details>
 
-Generates a self-contained HTML receipt. Add `--detail` for a full ESG-style report.
+<details>
+<summary><b><code>co2de compare</code></b> — AI vs Hand Coding</summary>
+
+```console
+$ co2de compare
+
+💨 AI Coding vs Hand Coding — This Session
+
+  ~1,456 lines written with AI assistance
+
+  AI coding:
+    ~1.60g CO2  (~0.0011g/line)
+    13,555,000 tokens over 42 min (wall clock, includes idle)
+
+  Hand coding estimate:
+    ~0.095g CO2  (~0.000065g/line)
+    ~8.1 hours (laptop 30W only, typing at 3 lines/min)
+
+  AI: ~17x more CO2, ~12x faster
+
+  Caveats:
+  AI CO2 includes all tokens (conversation, file reads, thinking)
+  Hand CO2 = laptop only. Real dev includes monitor, IDE, browsing
+```
+
+</details>
+
+<details>
+<summary><b><code>co2de log</code></b>, <b><code>co2de weekly</code></b>, <b><code>co2de audit</code></b>, and more...</summary>
+
+```console
+$ co2de log
+
+  SESSION LOG — Past 7 Days
+
+    #  TIME          MODEL      TOKENS      COST       CO2
+  ───  ────────────  ───────  ────────  ────────  ────────  ────────────
+    1  1d ago        opus        13.5M     $5.40    1.60g  ████████████
+    2  2d ago        haiku        2.8M     $0.28    0.04g  ▎░░░░░░░░░░░
+    3  3d ago        sonnet       6.2M     $3.72    0.22g  █▋░░░░░░░░░░
+    ...
+
+$ co2de weekly
+
+  WEEKLY CARBON REPORT
+  Apr  7 → Apr 13
+
+  DATE        SESSIONS     TOKENS        CO2      COST
+  Mon Apr  7         2     15.4M     0.93g    $10.05  ████████████████
+  Wed Apr  9         2     13.2M     0.74g     $8.60  ████████████▋░░░
+  Sun Apr 13         1     13.5M     1.60g     $5.40  ████████████████
+
+$ co2de audit
+
+  CARBON AUDIT — Efficiency Analysis
+
+  FINDINGS
+  SEV  PATTERN               POTENTIAL DESCRIPTION
+  ●●●  Model over-selection   -0.56g   8 of 12 responses used expensive model
+  ●●   Context bloat          -0.21g   Input grew 4.2x over 42 messages
+```
+
+</details>
+
+### `co2de export` — Carbon Receipt & ESG Report
+
+Generates a self-contained HTML report. Two styles:
 
 ```bash
 co2de export              # Carbon receipt (dark theme, shareable)
