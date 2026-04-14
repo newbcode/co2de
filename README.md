@@ -34,11 +34,7 @@ co2de init
 
 This patches your Claude Code statusline to show real-time CO2:
 
-```
-newbcode/co2de on main  |  Opus4  |  ctx 17%  |  $5.896  |  CO2 3.55g
-```
-
-CO2 color changes with emission level — dim when low, bold red when high.
+![statusline](examples/screenshot-status-line.png)
 
 ## Quick Start
 
