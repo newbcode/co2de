@@ -1,8 +1,10 @@
-import { ClaudeAdapter } from "../adapters/claude/index.js";
-import { renderHeatmap } from "../renderer/components/heatmap.js";
+import { ClaudeAdapter } from "../adapters/claude.js";
+import { loadConfig } from "../core/config.js";
+import { renderHeatmap } from "../renderer/charts.js";
 
 export async function heatmapCommand(): Promise<void> {
-  const adapter = new ClaudeAdapter();
+  const config = loadConfig();
+  const adapter = new ClaudeAdapter(config.region);
   const now = new Date();
   const monthAgo = new Date(now);
   monthAgo.setDate(monthAgo.getDate() - 30);

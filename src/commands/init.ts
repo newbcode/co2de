@@ -8,7 +8,7 @@ const STATUSLINE_PATH = join(homedir(), ".claude", "statusline-command.sh");
 
 const CO2_BLOCK = `
 # --- CO2 emission estimate (added by co2de) ---
-co2=$(awk -v ti="$total_in" -v to="$total_out" -v model="$model_id" \\
+co2_result=$(awk -v ti="$total_in" -v to="$total_out" -v model="$model_id" \\
   'BEGIN {
     wh = 0.0030
     if (model ~ /opus/)   wh = 0.0050
@@ -22,17 +22,31 @@ co2=$(awk -v ti="$total_in" -v to="$total_out" -v model="$model_id" \\
     else printf "%.0fg", co2_g
   }')
 
-co2_num=$(echo "$co2" | tr -d 'g')
+co2_num=$(echo "$co2_result" | tr -d 'g')
+
+co2_gauge=$(awk -v g="$co2_num" 'BEGIN {
+  if (g <= 0)      printf "%s", "    "
+  else if (g < 1)  printf "%s", "\\xe2\\x96\\x8f   "
+  else if (g < 5)  printf "%s", "\\xe2\\x96\\x8e   "
+  else if (g < 10) printf "%s", "\\xe2\\x96\\x8d\\xe2\\x96\\x91  "
+  else if (g < 20) printf "%s", "\\xe2\\x96\\x8c\\xe2\\x96\\x91  "
+  else if (g < 50) printf "%s", "\\xe2\\x96\\x88\\xe2\\x96\\x91\\xe2\\x96\\x91 "
+  else if (g < 100)printf "%s", "\\xe2\\x96\\x88\\xe2\\x96\\x88\\xe2\\x96\\x91 "
+  else if (g < 500)printf "%s", "\\xe2\\x96\\x88\\xe2\\x96\\x88\\xe2\\x96\\x88\\xe2\\x96\\x91"
+  else              printf "%s", "\\xe2\\x96\\x88\\xe2\\x96\\x88\\xe2\\x96\\x88\\xe2\\x96\\x88"
+}')
+
+RED_BG='\\033[41;97;1m'
+MAGENTA_BOLD='\\033[1;35m'
 if [ "$(echo "$co2_num >= 50" | bc -l 2>/dev/null || echo 0)" -eq 1 ]; then
-  co2_icon="\\xF0\\x9F\\x8F\\xAD"; co2_color="\${RED:-\\033[0;31m}"
+  co2_part="\${RED_BG:-\\$RED_BG} CO2 \${co2_gauge}\${co2_result} \${RESET}"
 elif [ "$(echo "$co2_num >= 10" | bc -l 2>/dev/null || echo 0)" -eq 1 ]; then
-  co2_icon="\\xF0\\x9F\\x92\\xA8\\xF0\\x9F\\x92\\xA8"; co2_color="\${MAGENTA:-\\033[0;35m}"
+  co2_part="\${MAGENTA_BOLD:-\\$MAGENTA_BOLD}CO2 \${co2_gauge}\${co2_result}\${RESET}"
 elif [ "$(echo "$co2_num >= 1" | bc -l 2>/dev/null || echo 0)" -eq 1 ]; then
-  co2_icon="\\xF0\\x9F\\x92\\xA8"; co2_color="\${YELLOW:-\\033[0;33m}"
+  co2_part="\${YELLOW}CO2 \${co2_gauge}\${co2_result}\${RESET}"
 else
-  co2_icon="\\xF0\\x9F\\x92\\xA8"; co2_color="\${GREEN:-\\033[0;32m}"
+  co2_part="\${DIM}\${GREEN}CO2 \${co2_gauge}\${co2_result}\${RESET}"
 fi
-co2_part="\${co2_color}\${co2_icon} \${co2}\${RESET}"
 # --- end co2de ---`;
 
 export function initCommand(): void {

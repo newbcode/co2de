@@ -1,11 +1,17 @@
-import { ClaudeAdapter } from "../adapters/claude/index.js";
-import { formatCO2, getToneMessage } from "../core/tone.js";
-import { colors, BAR } from "../renderer/colors.js";
+import { ClaudeAdapter } from "../adapters/claude.js";
+import { loadConfig } from "../core/config.js";
+import { colors } from "../renderer/colors.js";
 import { getEmissionLevel } from "../core/tone.js";
 import { colorForLevel } from "../renderer/colors.js";
+import {
+  fmtTokens, fmtCO2, fmtCost,
+  modelTag, coloredCO2, fmtTimeAgo,
+  precisionBar, ansiPadEnd,
+} from "../renderer/format.js";
 
 export async function logCommand(): Promise<void> {
-  const adapter = new ClaudeAdapter();
+  const config = loadConfig();
+  const adapter = new ClaudeAdapter(config.region);
   const now = new Date();
   const weekAgo = new Date(now);
   weekAgo.setDate(weekAgo.getDate() - 7);
@@ -17,56 +23,54 @@ export async function logCommand(): Promise<void> {
     return;
   }
 
+  const maxCO2 = Math.max(...sessions.map((s) => s.co2_grams), 1);
+  const barW = 12;
+
+  console.log("");
+  console.log(colors.bold("  SESSION LOG") + colors.dim(" — Past 7 Days"));
   console.log("");
 
-  const maxCO2 = Math.max(...sessions.map((s) => s.co2_grams), 1);
+  // Table header
+  const hdrNum = "#".padStart(3);
+  const hdrTime = "TIME".padEnd(12);
+  const hdrModel = "MODEL".padEnd(7);
+  const hdrTok = "TOKENS".padStart(8);
+  const hdrCost = "COST".padStart(8);
+  const hdrCO2 = "CO2".padStart(8);
+  console.log(
+    `  ${colors.dim(hdrNum)}  ${colors.dim(hdrTime)}  ${colors.dim(hdrModel)}  ${colors.dim(hdrTok)}  ${colors.dim(hdrCost)}  ${colors.dim(hdrCO2)}  ${colors.dim("".padEnd(barW))}`,
+  );
+  console.log(
+    colors.dim(`  ${"─".repeat(3)}  ${"─".repeat(12)}  ${"─".repeat(7)}  ${"─".repeat(8)}  ${"─".repeat(8)}  ${"─".repeat(8)}  ${"─".repeat(barW)}`),
+  );
 
-  for (const s of sessions) {
-    const shortId = s.id.slice(0, 7);
-    const timeAgo = formatTimeAgo(new Date(s.timestamp));
-    const model = shortModelName(s.model);
-    const tokens = s.total_tokens.toLocaleString();
-    const co2 = formatCO2(s.co2_grams);
+  // Session rows
+  for (let i = 0; i < sessions.length; i++) {
+    const s = sessions[i];
+    const num = String(i + 1).padStart(3);
+    const timeAgo = fmtTimeAgo(new Date(s.timestamp)).padEnd(12);
+    const model = ansiPadEnd(modelTag(s.model), 7);
+    const tokens = fmtTokens(s.total_tokens).padStart(8);
+    const cost = colors.dim(fmtCost(s.cost_usd).padStart(8));
+    const co2 = coloredCO2(s.co2_grams);
+    const co2Raw = fmtCO2(s.co2_grams);
+    const co2Padded = " ".repeat(Math.max(0, 8 - co2Raw.length)) + co2;
 
-    // Mini bar
-    const barWidth = 8;
-    const filled = Math.round((s.co2_grams / maxCO2) * barWidth);
-    const empty = barWidth - filled;
     const level = getEmissionLevel(s.co2_grams);
-    const barColor = colorForLevel(level);
-    const bar = barColor(BAR.filled.repeat(filled)) + colors.dim(BAR.empty.repeat(empty));
+    const co2Color = colorForLevel(level);
+    const bar = precisionBar(s.co2_grams, maxCO2, barW, co2Color);
 
     console.log(
-      `  ${colors.dim(shortId)}  ${timeAgo.padEnd(14)}${colors.magenta(model.padEnd(8))}  ${tokens.padStart(10)} tok  ${co2.padStart(7)}  ${bar}`,
+      `  ${colors.dim(num)}  ${timeAgo}  ${model}  ${tokens}  ${cost}  ${co2Padded}  ${bar}`,
     );
   }
 
-  // Total
+  // Summary
   const totalCO2 = sessions.reduce((s, ses) => s + ses.co2_grams, 0);
-  const totalTokens = sessions.reduce((s, ses) => s + ses.total_tokens, 0);
+  const totalCost = sessions.reduce((s, ses) => s + ses.cost_usd, 0);
   console.log("");
   console.log(
-    `  This week: ${formatCO2(totalCO2)} across ${sessions.length} sessions (${totalTokens.toLocaleString()} tokens)`,
+    `  This week: ${coloredCO2(totalCO2)} across ${sessions.length} sessions (${colors.dim(fmtCost(totalCost))})`,
   );
   console.log("");
-}
-
-function formatTimeAgo(date: Date): string {
-  const now = Date.now();
-  const diff = now - date.getTime();
-  const minutes = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-  const days = Math.floor(diff / 86400000);
-
-  if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes} min ago`;
-  if (hours < 24) return `${hours} hr ago`;
-  return `${days}d ago`;
-}
-
-function shortModelName(model: string): string {
-  if (model.includes("opus")) return "Opus4";
-  if (model.includes("sonnet")) return "S4.5";
-  if (model.includes("haiku")) return "Haiku";
-  return model.slice(0, 8);
 }
