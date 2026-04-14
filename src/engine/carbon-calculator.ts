@@ -1,7 +1,9 @@
 import type { TokenUsage, CarbonResult, MetaphorSet } from "../core/types.js";
 import {
   ENERGY_PER_TOKEN_WH,
+  COST_PER_1M_TOKENS,
   PUE,
+  CACHE_READ_ENERGY_FACTOR,
   CARBON_INTENSITY_GCO2_PER_KWH,
   METAPHORS,
 } from "../core/constants.js";
@@ -31,15 +33,13 @@ export function calculateCarbon(
   usage: TokenUsage,
   region = "global",
 ): CarbonResult {
-  const totalTokens =
-    usage.input_tokens +
-    usage.output_tokens +
-    usage.cache_read_tokens +
-    usage.cache_write_tokens;
-
   // Step 1: tokens → energy
+  // Cache reads skip prefill computation → use CACHE_READ_ENERGY_FACTOR of normal energy
   const whPerToken = getEnergyPerToken(usage.model);
-  const rawEnergyWh = totalTokens * whPerToken;
+  const fullPriceTokens = usage.input_tokens + usage.output_tokens + usage.cache_write_tokens;
+  const rawEnergyWh =
+    fullPriceTokens * whPerToken +
+    usage.cache_read_tokens * whPerToken * CACHE_READ_ENERGY_FACTOR;
   const energyWh = rawEnergyWh * PUE;
 
   // Step 2: energy → CO2
@@ -89,50 +89,28 @@ export function calculateMetaphors(co2Grams: number): MetaphorSet {
 }
 
 /**
- * Calculate CO2 for a simple token count (used by statusline and quick summaries).
+ * Resolve cost rates for a given model.
  */
-export function quickCO2(
-  inputTokens: number,
-  outputTokens: number,
-  model: string,
-  region = "global",
-): number {
-  const totalTokens = inputTokens + outputTokens;
-  const whPerToken = getEnergyPerToken(model);
-  const energyWh = totalTokens * whPerToken * PUE;
-  const carbonIntensity =
-    CARBON_INTENSITY_GCO2_PER_KWH[region] ??
-    CARBON_INTENSITY_GCO2_PER_KWH["global"];
-  return (energyWh / 1000) * carbonIntensity;
+function getCostRates(model: string): { input: number; output: number; cache_read: number } {
+  const m = model.toLowerCase();
+  if (m.includes("opus")) return COST_PER_1M_TOKENS["claude-opus"];
+  if (m.includes("sonnet")) return COST_PER_1M_TOKENS["claude-sonnet"];
+  if (m.includes("haiku")) return COST_PER_1M_TOKENS["claude-haiku"];
+  if (m.includes("gemini") && m.includes("pro")) return COST_PER_1M_TOKENS["gemini-pro"];
+  if (m.includes("gemini") && m.includes("flash")) return COST_PER_1M_TOKENS["gemini-flash"];
+  return COST_PER_1M_TOKENS["default"];
 }
 
 /**
- * Aggregate multiple CarbonResults into a total.
+ * Calculate USD cost from token usage.
  */
-export function aggregateResults(results: CarbonResult[]): {
-  total_tokens: number;
-  total_energy_wh: number;
-  total_co2_grams: number;
-  equivalents: MetaphorSet;
-} {
-  let totalTokens = 0;
-  let totalEnergyWh = 0;
-  let totalCo2 = 0;
-
-  for (const r of results) {
-    totalTokens +=
-      r.usage.input_tokens +
-      r.usage.output_tokens +
-      r.usage.cache_read_tokens +
-      r.usage.cache_write_tokens;
-    totalEnergyWh += r.energy_wh;
-    totalCo2 += r.co2_grams;
-  }
-
-  return {
-    total_tokens: totalTokens,
-    total_energy_wh: totalEnergyWh,
-    total_co2_grams: totalCo2,
-    equivalents: calculateMetaphors(totalCo2),
-  };
+export function calculateCost(usage: TokenUsage): number {
+  const rates = getCostRates(usage.model);
+  const inputCost = (usage.input_tokens / 1_000_000) * rates.input;
+  const outputCost = (usage.output_tokens / 1_000_000) * rates.output;
+  const cacheReadCost = (usage.cache_read_tokens / 1_000_000) * rates.cache_read;
+  const cacheWriteCost = (usage.cache_write_tokens / 1_000_000) * rates.input; // cache writes charged at input rate
+  return inputCost + outputCost + cacheReadCost + cacheWriteCost;
 }
+
+

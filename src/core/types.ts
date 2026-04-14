@@ -28,19 +28,6 @@ export interface MetaphorSet {
   led_bulb_hours: number;
 }
 
-/** Aggregated session record */
-export interface SessionRecord {
-  id: string;
-  provider: string;
-  project_path: string;
-  started_at: string;
-  ended_at: string;
-  entries: TokenUsage[];
-  total_tokens: number;
-  total_co2_grams: number;
-  lines_written: number;
-}
-
 /** Summary for listing sessions */
 export interface SessionSummary {
   id: string;
@@ -49,24 +36,7 @@ export interface SessionSummary {
   timestamp: string;
   total_tokens: number;
   co2_grams: number;
-}
-
-/** Project-level carbon footprint */
-export interface ProjectFootprint {
-  project_path: string;
-  project_name: string;
-  sessions: SessionSummary[];
-  total_sessions: number;
-  total_tokens: number;
-  total_co2_grams: number;
-  date_range: { from: string; to: string };
-  phase_breakdown: PhaseBreakdown[];
-}
-
-export interface PhaseBreakdown {
-  phase: string;
-  co2_grams: number;
-  percentage: number;
+  cost_usd: number;
 }
 
 /** Hand-coding vs AI-coding comparison */
@@ -105,13 +75,18 @@ export interface AuditFinding {
   suggestion: string;
 }
 
-/** Offset action log entry */
-export interface OffsetEntry {
-  timestamp: string;
-  project_path: string;
-  co2_grams_offset: number;
-  method: string;
-  note: string;
+/** Bundled data for HTML report generation */
+export interface ReportData {
+  sessions: SessionSummary[];
+  tokenEntries: TokenUsage[];
+  savings: SavingsReport;
+  config: Co2deConfig;
+  metaphors: MetaphorSet;
+  totalCO2: number;
+  totalTokens: number;
+  totalEnergyWh: number;
+  period: string;
+  generatedAt: string;
 }
 
 /** User configuration */

@@ -20,33 +20,26 @@ export function getToneMessage(co2_grams: number): ToneMessage {
     case "low":
       return {
         level,
-        statusline_icon: "\u{1F4A8}", // 💨
-        summary: (g) => `Light session. ${formatCO2(g)} CO2.`,
+        statusline_icon: "CO2",
+        summary: (g) => `${formatCO2(g)} CO2 this session.`,
       };
     case "medium":
       return {
         level,
-        statusline_icon: "\u{1F4A8}", // 💨
-        summary: (g) => {
-          const searches = (g / 0.2).toFixed(0);
-          return `That's ${formatCO2(g)} — equivalent to ${searches} Google searches.`;
-        },
+        statusline_icon: "CO2",
+        summary: (g) => `${formatCO2(g)} CO2 this session.`,
       };
     case "high":
       return {
         level,
-        statusline_icon: "\u{1F4A8}\u{1F4A8}", // 💨💨
-        summary: (g) =>
-          `Heavy session: ${formatCO2(g)}. Could a smaller model handle next time?`,
+        statusline_icon: "CO2",
+        summary: (g) => `${formatCO2(g)} CO2 this session.`,
       };
     case "extreme":
       return {
         level,
-        statusline_icon: "\u{1F3ED}", // 🏭
-        summary: (g) => {
-          const meters = ((g / 120) * 1000).toFixed(0);
-          return `${formatCO2(g)} CO2. Same as driving ${meters} meters.`;
-        },
+        statusline_icon: "CO2",
+        summary: (g) => `${formatCO2(g)} CO2 this session.`,
       };
   }
 }

@@ -3,18 +3,20 @@ import type {
   SavingsReport,
   SavingsBreakdownItem,
 } from "../core/types.js";
-import { ENERGY_PER_TOKEN_WH } from "../core/constants.js";
-import { quickCO2 } from "./carbon-calculator.js";
+import { calculateCarbon } from "./carbon-calculator.js";
 
 /**
  * Calculate carbon savings by comparing actual usage against a worst-case baseline.
  *
- * Worst-case baseline assumptions:
- * - Always using the most expensive model (Opus: 0.005 Wh/token)
- * - No cache hits (all tokens are fresh context)
- * - No session splitting (maximum context bloat)
+ * ## Methodology
  *
- * The difference between worst-case and actual = savings from smart choices.
+ * ACTUAL:  CO2 from real usage. Cache reads use ~10% energy (CACHE_READ_ENERGY_FACTOR).
+ * WORST:   CO2 if (1) all responses used Opus AND (2) no cache — every token at full energy.
+ * SAVED:   WORST − ACTUAL = cache efficiency savings + model choice savings.
+ *
+ * ## Breakdown
+ * - Cache reuse: cache_read tokens served at 10% energy instead of 100%
+ * - Lighter models: Sonnet/Haiku instead of Opus
  */
 export function calculateSavings(
   entries: TokenUsage[],
@@ -31,81 +33,69 @@ export function calculateSavings(
     };
   }
 
-  const opusRate = ENERGY_PER_TOKEN_WH["claude-opus"];
   let actualCO2 = 0;
   let worstCaseCO2 = 0;
-  let modelSavings = 0;
-  let cacheSavings = 0;
+  let modelSavingsGrams = 0;
+  let cacheSavingsGrams = 0;
   let smallModelCount = 0;
-  let totalEntries = 0;
 
   for (const entry of entries) {
-    const totalTokens =
-      entry.input_tokens +
-      entry.output_tokens +
-      entry.cache_read_tokens +
-      entry.cache_write_tokens;
+    // ── Actual: real model, cache_read at discounted energy ──
+    const actual = calculateCarbon(entry, region);
+    actualCO2 += actual.co2_grams;
 
-    // Actual CO2
-    const actual = quickCO2(
-      entry.input_tokens + entry.cache_read_tokens + entry.cache_write_tokens,
-      entry.output_tokens,
-      entry.model,
-      region,
-    );
-    actualCO2 += actual;
+    // ── Worst-case: Opus + no cache discount ──
+    // Move cache_read into input (full price) and zero out cache_read
+    const worstEntry: TokenUsage = {
+      ...entry,
+      model: "claude-opus-4-6",
+      input_tokens: entry.input_tokens + entry.cache_read_tokens,
+      cache_read_tokens: 0,
+    };
+    const worst = calculateCarbon(worstEntry, region);
+    worstCaseCO2 += worst.co2_grams;
 
-    // Worst case: same tokens but with opus rate
-    const worstCase = quickCO2(
-      entry.input_tokens + entry.cache_read_tokens + entry.cache_write_tokens,
-      entry.output_tokens,
-      "claude-opus-4-6", // always opus
-      region,
-    );
-    worstCaseCO2 += worstCase;
-
-    // Track model choice savings
+    // ── Model savings: what if this entry used opus (but kept cache discount)? ──
     if (!entry.model.toLowerCase().includes("opus")) {
-      modelSavings += worstCase - actual;
+      const asOpus = calculateCarbon({ ...entry, model: "claude-opus-4-6" }, region);
+      modelSavingsGrams += asOpus.co2_grams - actual.co2_grams;
       smallModelCount++;
     }
 
-    // Track cache efficiency savings
+    // ── Cache savings: worst(no cache) - same model with cache ──
     if (entry.cache_read_tokens > 0) {
-      // Cache reads reuse existing context instead of regenerating
-      const cacheReuseCO2 = quickCO2(
-        entry.cache_read_tokens,
-        0,
-        entry.model,
-        region,
-      );
-      cacheSavings += cacheReuseCO2 * 0.3; // ~30% savings from cache hits
+      const sameModelNoCache: TokenUsage = {
+        ...entry,
+        input_tokens: entry.input_tokens + entry.cache_read_tokens,
+        cache_read_tokens: 0,
+      };
+      const noCache = calculateCarbon(sameModelNoCache, region);
+      cacheSavingsGrams += noCache.co2_grams - actual.co2_grams;
     }
-
-    totalEntries++;
   }
 
+  const totalSaved = Math.max(0, worstCaseCO2 - actualCO2);
+
+  // ── Breakdown ──
   const breakdown: SavingsBreakdownItem[] = [];
 
-  if (modelSavings > 0) {
+  if (cacheSavingsGrams > 0) {
     breakdown.push({
-      category: "Smart model choices",
-      description: `${smallModelCount} tasks used a lighter model instead of Opus`,
-      saved_grams: modelSavings,
+      category: "Cache reuse",
+      description: "Cached tokens served at ~10% energy cost",
+      saved_grams: cacheSavingsGrams,
     });
   }
 
-  if (cacheSavings > 0) {
+  if (modelSavingsGrams > 0) {
     breakdown.push({
-      category: "Cache efficiency",
-      description: "Token reuse from cache hits",
-      saved_grams: cacheSavings,
+      category: "Lighter models",
+      description: `${smallModelCount} responses used Sonnet/Haiku instead of Opus`,
+      saved_grams: modelSavingsGrams,
     });
   }
 
-  const totalSaved = worstCaseCO2 - actualCO2;
-
-  // Determine period from timestamps
+  // ── Period ──
   const timestamps = entries.map((e) => e.timestamp).sort();
   const from = timestamps[0]?.slice(0, 10) ?? "unknown";
   const to = timestamps[timestamps.length - 1]?.slice(0, 10) ?? "unknown";
@@ -115,8 +105,8 @@ export function calculateSavings(
     period,
     actual_co2_grams: actualCO2,
     worst_case_co2_grams: worstCaseCO2,
-    saved_co2_grams: Math.max(0, totalSaved),
+    saved_co2_grams: totalSaved,
     savings_breakdown: breakdown,
-    lifetime_saved_grams: Math.max(0, totalSaved),
+    lifetime_saved_grams: totalSaved,
   };
 }

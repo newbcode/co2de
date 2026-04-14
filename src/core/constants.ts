@@ -25,6 +25,22 @@ export const ENERGY_PER_TOKEN_WH: Record<string, number> = {
 };
 
 /**
+ * Cost per million tokens (USD) by model family.
+ *
+ * Source: Anthropic pricing page (as of 2025)
+ * Input and output tokens have different rates.
+ * Cache read tokens are discounted.
+ */
+export const COST_PER_1M_TOKENS: Record<string, { input: number; output: number; cache_read: number }> = {
+  "claude-opus": { input: 15, output: 75, cache_read: 1.5 },
+  "claude-sonnet": { input: 3, output: 15, cache_read: 0.3 },
+  "claude-haiku": { input: 0.25, output: 1.25, cache_read: 0.025 },
+  "gemini-pro": { input: 1.25, output: 5, cache_read: 0.3 },
+  "gemini-flash": { input: 0.075, output: 0.3, cache_read: 0.02 },
+  default: { input: 3, output: 15, cache_read: 0.3 },
+};
+
+/**
  * Power Usage Effectiveness (PUE) — datacenter overhead multiplier.
  *
  * PUE accounts for cooling, networking, storage, and other infrastructure
@@ -38,6 +54,18 @@ export const ENERGY_PER_TOKEN_WH: Record<string, number> = {
  * We use 1.2 as a reasonable estimate for hyperscaler datacenters.
  */
 export const PUE = 1.2;
+
+/**
+ * Cache read energy discount factor.
+ *
+ * Prompt caching stores KV cache states. Serving from KV cache skips
+ * the prefill computation entirely, using significantly less energy.
+ * Anthropic charges cache reads at 10% of input price, reflecting
+ * the reduced compute cost.
+ *
+ * We use 0.1 (10% of normal energy) as a conservative estimate.
+ */
+export const CACHE_READ_ENERGY_FACTOR = 0.1;
 
 /**
  * Carbon intensity by region (gCO2 per kWh of electricity).
@@ -112,21 +140,3 @@ export const HANDCODE = {
   laptop_watts: 30,
 };
 
-/**
- * Carbon offset cost estimates (USD per gram CO2).
- *
- * Sources:
- * - One Tree Planted: ~$1 per tree, each absorbs ~22kg CO2/year over ~40 years
- * - Gold Standard carbon credits: ~$10-30 per ton CO2
- * - Renewable Energy Certificates: ~$2-5 per MWh
- */
-export const OFFSET_COST = {
-  /** USD per gram CO2 via tree planting */
-  tree_planting_usd_per_gram: 0.00035,
-
-  /** USD per gram CO2 via carbon credits */
-  carbon_credit_usd_per_gram: 0.00007,
-
-  /** USD per gram CO2 via renewable energy certificates */
-  renewable_cert_usd_per_gram: 0.00002,
-};
