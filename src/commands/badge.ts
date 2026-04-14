@@ -16,7 +16,7 @@ function generateBadgeUrl(co2Grams: number): string {
 
 function generateBadgeMarkdown(co2Grams: number): string {
   const url = generateBadgeUrl(co2Grams);
-  return `[![co2de carbon badge](${url})](https://github.com/anthropics/co2de)`;
+  return `[![co2de carbon badge](${url})](https://github.com/newbcode/co2de)`;
 }
 
 function generateBadgeBlock(co2Grams: number): string {

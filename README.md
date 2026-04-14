@@ -1,11 +1,12 @@
 # co2de
 
 <!-- co2de-badge:start -->
-[![co2de carbon badge](https://img.shields.io/badge/CO2-~3.55g-yellow)](https://github.com/anthropics/co2de)
+[![co2de carbon badge](https://img.shields.io/badge/CO2-~3.55g-yellow)](https://github.com/newbcode/co2de)
 <!-- co2de-badge:end -->
 
-[![npm version](https://img.shields.io/npm/v/co2de)](https://www.npmjs.com/package/co2de)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/newbcode/co2de)](https://github.com/newbcode/co2de)
+[![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)](https://nodejs.org/)
 
 > Track the carbon cost of vibe coding, one token at a time.
 
