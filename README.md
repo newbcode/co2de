@@ -241,6 +241,10 @@ co2de export --detail     # Formal report (light theme, printable, methodology i
 co2de export --month      # Past 30 days
 ```
 
+**Carbon Receipt** (`co2de export`) — [view example](examples/report-receipt.html)
+
+**ESG Detail Report** (`co2de export --detail`) — [view example](examples/report-detail.html)
+
 ## Commands
 
 | Command | Description |
