@@ -93,17 +93,30 @@ $ co2de usage
   PROJECT                SES    TOKENS      COST       CO2   HIT  EMISSION
   ────────────────────── ───  ────────  ────────  ────────  ────  ────────────────
   nextjs-blog              8     52.3M    $28.17     3.55g   93%  ████████████████
+  ────────────────────── ───  ────────  ────────  ────────  ────  ────────────────
+  TOTAL                    8     52.3M    $28.17     3.55g   93%
 
   SESSION DETAIL
-    #  DATE    MODEL      TOKENS    ...    CO2   HIT
+    #  DATE    MODEL      TOKENS       IN      OUT       CW       CR     COST      CO2   HIT
   ···  nextjs-blog  — $28.17 · 3.55g · 8 ses
-    1  Apr 13  opus        13.5M   ...   1.60g   88%  ████████████
-    2  Apr 12  haiku        2.8M   ...   0.04g   91%  ▎░░░░░░░░░░░
-    3  Apr 11  sonnet       6.2M   ...   0.22g   93%  █▊░░░░░░░░░░
-    ...
+    1  Apr 13  opus        13.5M     8.2K   285.3K   412.0K    12.8M    $5.40    1.60g   88%  ████████████
+    2  Apr 12  haiku        2.8M     1.4K    42.1K    85.3K     2.7M    $0.28    0.04g   91%  ▎░░░░░░░░░░░
+    3  Apr 11  sonnet       6.2M     3.8K   125.4K   218.5K     5.8M    $3.72    0.22g   93%  █▊░░░░░░░░░░
+    4  Apr  9  sonnet       4.5M     2.1K    98.2K   165.8K     4.2M    $2.70    0.16g   93%  █▎░░░░░░░░░░
+    5  Apr  9  opus         8.7M     5.6K   210.4K   312.5K     8.2M    $5.90    0.58g   94%  ████▍░░░░░░░
+    6  Apr  8  haiku        1.2M       820    32.1K    52.3K     1.1M    $0.12    0.02g   90%  ▏░░░░░░░░░░░
+    7  Apr  7  sonnet       3.1M     1.8K    72.4K   128.5K     2.9M    $1.85    0.11g   92%  ▉░░░░░░░░░░░
+    8  Apr  7  opus        12.3M     6.4K   245.2K   385.1K    11.7M    $8.20    0.82g   95%  ██████▎░░░░░
+
+  MODEL BREAKDOWN
+  opus     ██████████████████████████  $19.50    34.5M tok   3.00g
+  sonnet   ████████████████░░░░░░░░░░   $8.27    13.8M tok   0.49g
+  haiku    ████░░░░░░░░░░░░░░░░░░░░░░   $0.40     4.0M tok   0.06g
 
   INSIGHTS
   ● Heaviest session: nextjs-blog Apr 13 — 1.60g CO2
+  ● Most expensive: nextjs-blog Apr  7 — $8.20
+  ● Lowest cache hit: nextjs-blog Apr 13 — 88% (keep stable system prompts)
   ● Avg per session: ~0.44g
 ```
 
@@ -135,11 +148,19 @@ STEP 3: Carbon Emission
   Region: us → 390 gCO2/kWh
   CO2:    11.9659 × 390 = 1.60g CO2e
 
+MODEL SUGGESTION
+  If Sonnet:  ~0.80g (50% less)
+  If Haiku:   ~0.32g (80% less)
+
 REGIONAL IMPACT — Same tokens, different grids
   Your region (us)    ████████████▍░░░░░░░   1.60g   390 gCO2/kWh
   France (nuclear)    █▊░░░░░░░░░░░░░░░░░░   0.23g    55 gCO2/kWh  -86%
   Norway (hydro)      ▍░░░░░░░░░░░░░░░░░░░   0.04g    10 gCO2/kWh  -97%
   India (coal-heavy)  ████████████████████   2.59g   630 gCO2/kWh  +62%
+
+  NOTE
+  Token-based CO2 is an approximation (R²≈0.44 vs actual energy).
+  Source: Mamun et al. 2026, arXiv:2604.02776
 ```
 
 </details>
@@ -161,7 +182,11 @@ $ co2de savings
   Lighter models       ██████░░░░░░░░  1.86g saved
 
   Cache hit rate: 93% — higher = more savings
-  Excellent efficiency.
+  Excellent efficiency. Cache reuse is saving most of your energy.
+
+  ACTUAL = cache reads at 10% energy + real model
+  WORST  = all Opus + no cache (every token full price)
+  SAVED  = WORST − ACTUAL
 ```
 
 </details>
@@ -184,11 +209,15 @@ $ co2de compare
     ~0.095g CO2  (~0.000065g/line)
     ~8.1 hours (laptop 30W only, typing at 3 lines/min)
 
+  Hand  █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0.095g
+  AI    ██████████████████████████████  1.60g
+
   AI: ~17x more CO2, ~12x faster
 
   Caveats:
   AI CO2 includes all tokens (conversation, file reads, thinking)
   Hand CO2 = laptop only. Real dev includes monitor, IDE, browsing
+  Hand time = raw typing speed. Real dev is 3-10x slower
 ```
 
 </details>
@@ -206,7 +235,13 @@ $ co2de log
     1  1d ago        opus        13.5M     $5.40    1.60g  ████████████
     2  2d ago        haiku        2.8M     $0.28    0.04g  ▎░░░░░░░░░░░
     3  3d ago        sonnet       6.2M     $3.72    0.22g  █▋░░░░░░░░░░
-    ...
+    4  4d ago        sonnet       4.5M     $2.70    0.16g  █▎░░░░░░░░░░
+    5  4d ago        opus         8.7M     $5.90    0.58g  ████▍░░░░░░░
+    6  5d ago        haiku        1.2M     $0.12    0.02g  ░░░░░░░░░░░░
+    7  6d ago        sonnet       3.1M     $1.85    0.11g  ▊░░░░░░░░░░░
+    8  6d ago        opus        12.3M     $8.20    0.82g  ██████▏░░░░░
+
+  This week: 3.55g across 8 sessions ($28.17)
 
 $ co2de weekly
 
@@ -214,18 +249,34 @@ $ co2de weekly
   Apr  7 → Apr 13
 
   DATE        SESSIONS     TOKENS        CO2      COST
+  ──────────  ────────   ────────   ────────  ────────  ────────────────
   Mon Apr  7         2     15.4M     0.93g    $10.05  ████████████████
+  Tue Apr  8         1      1.2M     0.02g     $0.12  ▎░░░░░░░░░░░░░░░
   Wed Apr  9         2     13.2M     0.74g     $8.60  ████████████▋░░░
+  Thu Apr 10         -          -         -         -
+  Fri Apr 11         1      6.2M     0.22g     $3.72  ███▊░░░░░░░░░░░░
+  Sat Apr 12         1      2.8M     0.04g     $0.28  ▋░░░░░░░░░░░░░░░
   Sun Apr 13         1     13.5M     1.60g     $5.40  ████████████████
+  ──────────  ────────   ────────   ────────  ────────  ────────────────
+  TOTAL              8     52.3M     3.55g    $28.17
+
+  Avg: 0.71g/day · Peak: Sun (1.60g)
 
 $ co2de audit
 
-  CARBON AUDIT — Efficiency Analysis
+  CARBON AUDIT — Efficiency Analysis  session a1b2c3d
 
   FINDINGS
   SEV  PATTERN               POTENTIAL DESCRIPTION
-  ●●●  Model over-selection   -0.56g   8 of 12 responses used expensive model
-  ●●   Context bloat          -0.21g   Input grew 4.2x over 42 messages
+  ───  ───────────────────   ────────  ─────────────────────────
+  ●●●  Model over-selection   -0.56g   8 of 12 responses were simple (<500 output tokens) but used an expensive model
+  ●●   Context bloat          -0.21g   Input tokens grew 4.2x over 42 messages (3,102 → 13,028)
+  ●    Redundant file reads  -0.001g   2 files read 3+ times: page.tsx (5x), layout.tsx (3x)
+
+  TOTAL POTENTIAL SAVINGS: 0.77g (48% of session)
+  ██████████░░░░░░░░░░░ 48% recoverable
+
+  TIP: Run `co2de compare` to see AI vs hand-coding impact.
 ```
 
 </details>
