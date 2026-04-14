@@ -89,6 +89,28 @@ export function calculateMetaphors(co2Grams: number): MetaphorSet {
 }
 
 /**
+ * Quick CO2 estimate for a simple input/output pair (no cache tokens).
+ */
+export function quickCO2(
+  inputTokens: number,
+  outputTokens: number,
+  model: string,
+  region = "global",
+): number {
+  const usage: TokenUsage = {
+    input_tokens: inputTokens,
+    output_tokens: outputTokens,
+    cache_read_tokens: 0,
+    cache_write_tokens: 0,
+    model,
+    provider: "unknown",
+    timestamp: new Date().toISOString(),
+    session_id: "",
+  };
+  return calculateCarbon(usage, region).co2_grams;
+}
+
+/**
  * Resolve cost rates for a given model.
  */
 function getCostRates(model: string): { input: number; output: number; cache_read: number } {

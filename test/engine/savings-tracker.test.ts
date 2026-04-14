@@ -21,12 +21,12 @@ describe("calculateSavings", () => {
     expect(result.actual_co2_grams).toBeGreaterThan(0);
     expect(result.worst_case_co2_grams).toBeGreaterThan(result.actual_co2_grams);
     expect(result.saved_co2_grams).toBeGreaterThan(0);
-    expect(result.savings_breakdown.some((b) => b.category === "Smart model choices")).toBe(true);
+    expect(result.savings_breakdown.some((b) => b.category === "Lighter models")).toBe(true);
   });
 
   it("shows no model savings when using Opus", () => {
     const entries = [
-      createMockEntry({ model: "claude-opus-4-6", input_tokens: 10000, output_tokens: 5000 }),
+      createMockEntry({ model: "claude-opus-4-6", input_tokens: 10000, output_tokens: 5000, cache_read_tokens: 0 }),
     ];
 
     const result = calculateSavings(entries);
@@ -45,6 +45,6 @@ describe("calculateSavings", () => {
     ];
 
     const result = calculateSavings(entries);
-    expect(result.savings_breakdown.some((b) => b.category === "Cache efficiency")).toBe(true);
+    expect(result.savings_breakdown.some((b) => b.category === "Cache reuse")).toBe(true);
   });
 });
