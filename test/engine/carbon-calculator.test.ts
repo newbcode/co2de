@@ -4,7 +4,6 @@ import {
   quickCO2,
   getEnergyPerToken,
   calculateMetaphors,
-  aggregateResults,
 } from "../../src/engine/carbon-calculator.js";
 import type { TokenUsage } from "../../src/core/types.js";
 
@@ -159,21 +158,3 @@ describe("quickCO2", () => {
   });
 });
 
-describe("aggregateResults", () => {
-  it("sums multiple results correctly", () => {
-    const r1 = calculateCarbon(
-      makeUsage({ input_tokens: 1000, output_tokens: 500 }),
-    );
-    const r2 = calculateCarbon(
-      makeUsage({ input_tokens: 2000, output_tokens: 1000 }),
-    );
-
-    const agg = aggregateResults([r1, r2]);
-
-    expect(agg.total_tokens).toBe(4500);
-    expect(agg.total_co2_grams).toBeCloseTo(
-      r1.co2_grams + r2.co2_grams,
-      5,
-    );
-  });
-});

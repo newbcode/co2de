@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>co2de carbon receipt — Past 7 Days</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:#0a0a0a;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  padding:40px 16px 80px;
+  font-family:'JetBrains Mono',monospace;
+}
+.receipt-wrap{
+  width:100%;
+  max-width:380px;
+}
+.receipt{
+  background:#faf8f0;
+  color:#1a1a1a;
+  border-radius:8px 8px 0 0;
+  padding:32px 24px 24px;
+  position:relative;
+  box-shadow:0 4px 24px rgba(0,0,0,.5);
+  font-size:13px;
+  line-height:1.6;
+}
+.receipt::after{
+  content:'';
+  position:absolute;
+  bottom:-10px;
+  left:0;
+  width:100%;
+  height:10px;
+  background:
+    linear-gradient(135deg, #faf8f0 33.33%, transparent 33.33%) 0 0,
+    linear-gradient(-135deg, #faf8f0 33.33%, transparent 33.33%) 0 0;
+  background-size:12px 10px;
+  background-repeat:repeat-x;
+}
+.receipt-shadow{
+  height:20px;
+  margin:0 8px;
+  background:rgba(0,0,0,.15);
+  filter:blur(8px);
+  border-radius:0 0 50% 50%;
+}
+
+/* Header */
+.header{text-align:center;margin-bottom:4px}
+.logo{font-size:24px;font-weight:700;letter-spacing:-1px}
+.logo .two{color:#cc4444}
+.subtitle{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#666;margin-top:2px}
+.date-range{font-size:12px;color:#888;margin-top:6px}
+
+/* Divider */
+.divider{
+  border:none;
+  border-top:1.5px dashed #ccc;
+  margin:14px 0;
+}
+
+/* Lines */
+.line{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  padding:2px 0;
+  font-size:13px;
+}
+.line .l{color:#444}
+.line .r{font-weight:500;text-align:right}
+
+/* Section headers */
+.section-hdr{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:#1a1a1a;
+  margin-bottom:4px;
+  margin-top:2px;
+}
+
+/* Subtotal / Total emphasis */
+.line-total .r{font-weight:700;font-size:15px}
+.line-grand{font-size:14px;font-weight:700}
+.line-grand .r{font-size:15px}
+
+/* Equivalents */
+.equiv{padding:2px 0;font-size:12px;color:#555}
+.equiv .symbol{color:#888;margin-right:2px}
+.equiv .val{float:right;color:#1a1a1a;font-weight:500}
+
+/* Region */
+.region-line{display:flex;justify-content:space-between;font-size:12px;padding:1px 0}
+.region-line .name{color:#555}
+.region-line .data{text-align:right;color:#1a1a1a;font-weight:500}
+.region-line .diff-neg{color:#2a7a2a}
+.region-line .diff-pos{color:#cc3333}
+
+/* Disclaimer */
+.disclaimer{
+  font-size:10px;
+  color:#999;
+  line-height:1.5;
+  margin-top:2px;
+}
+
+/* Barcode */
+.barcode{
+  display:flex;
+  justify-content:center;
+  align-items:flex-end;
+  gap:1px;
+  height:40px;
+  margin:16px auto 8px;
+  max-width:200px;
+}
+.barcode .bar{
+  background:#1a1a1a;
+  flex-shrink:0;
+}
+
+/* Footer text */
+.receipt-footer{
+  text-align:center;
+  font-size:11px;
+  color:#888;
+  margin-top:4px;
+}
+.receipt-footer .version{font-size:10px;color:#aaa;margin-top:2px}
+.tagline{
+  text-align:center;
+  font-size:11px;
+  color:#999;
+  margin-top:12px;
+  font-style:italic;
+  letter-spacing:0.5px;
+}
+</style>
+</head>
+<body>
+
+<div class="receipt-wrap">
+  <div class="receipt">
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">co<span class="two">2</span>de</div>
+      <div class="subtitle">Carbon Receipt</div>
+      <div class="date-range">Apr 07 → Apr 13</div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Summary stats -->
+    <div class="line"><span class="l">TOKENS</span><span class="r">52.3M</span></div>
+    <div class="line"><span class="l">SESSIONS</span><span class="r">8</span></div>
+    <div class="line"><span class="l">ACTIVE DAYS</span><span class="r">5</span></div>
+
+    <hr class="divider">
+
+    <!-- Model breakdown -->
+    <div class="section-hdr">Model Breakdown</div>
+    <div class="line"><span class="l">&nbsp;&nbsp;Opus</span><span class="r">38%&nbsp;&nbsp;&nbsp;&nbsp;~1.35g</span></div>
+    <div class="line"><span class="l">&nbsp;&nbsp;Sonnet</span><span class="r">42%&nbsp;&nbsp;&nbsp;&nbsp;~1.49g</span></div>
+    <div class="line"><span class="l">&nbsp;&nbsp;Haiku</span><span class="r">20%&nbsp;&nbsp;&nbsp;&nbsp;~0.71g</span></div>
+
+    <hr class="divider">
+
+    <!-- Subtotal -->
+    <div class="line line-total"><span class="l">SUBTOTAL</span><span class="r">~3.55g</span></div>
+
+    <div style="height:8px"></div>
+
+    <!-- Equivalents -->
+    <div class="equiv"><span class="symbol">≈</span> driving<span class="val">29.6 m</span></div>
+    <div class="equiv"><span class="symbol">≈</span> Netflix<span class="val">5.9 min</span></div>
+    <div class="equiv"><span class="symbol">≈</span> Google<span class="val">18 srch</span></div>
+    <div class="equiv"><span class="symbol">≈</span> phone chg<span class="val">0.4</span></div>
+    <div class="equiv"><span class="symbol">≈</span> LED bulb<span class="val">0.36 hrs</span></div>
+
+    <hr class="divider">
+
+    <!-- Cost -->
+    <div class="line line-grand"><span class="l">TOTAL COST</span><span class="r">$28.17</span></div>
+    <div class="line"><span class="l">CARBON COST</span><span class="r">~0.13g/$</span></div>
+
+    <hr class="divider">
+
+    <!-- Region -->
+    <div class="section-hdr">REGION: US (390 gCO2/kWh)</div>
+    <div class="region-line"><span class="name">&nbsp;&nbsp;If France</span><span class="data">~0.50g&nbsp;&nbsp;<span class="diff-neg">-86%</span></span></div>
+    <div class="region-line"><span class="name">&nbsp;&nbsp;If Norway</span><span class="data">~0.09g&nbsp;&nbsp;<span class="diff-neg">-97%</span></span></div>
+    <div class="region-line"><span class="name">&nbsp;&nbsp;If India</span><span class="data">~5.74g&nbsp;&nbsp;<span class="diff-pos">+62%</span></span></div>
+
+    <hr class="divider">
+
+    <!-- Disclaimer -->
+    <div class="disclaimer">
+      ~ = token-based estimate<br>
+      R² ≈ 0.44 vs actual energy<br>
+      Mamun et al. 2026
+    </div>
+
+    <!-- Barcode -->
+    <div class="barcode" id="barcode"></div>
+    <div class="receipt-footer">
+      <div class="version">co2de v0.1.0</div>
+    </div>
+
+    <div style="height:8px"></div>
+    <div class="tagline">know the cost of<br>your convenience</div>
+  </div>
+  <div class="receipt-shadow"></div>
+</div>
+
+<script>
+(function(){
+  var bc = document.getElementById('barcode');
+  var widths = [2,1,3,1,2,1,1,3,2,1,1,2,3,1,2,1,1,3,1,2,1,3,2,1,1,2,1,3,1,2,1,1,2,3,1,2];
+  for (var i = 0; i < widths.length; i++) {
+    var bar = document.createElement('div');
+    bar.className = 'bar';
+    var w = widths[i];
+    var h = 30 + Math.floor(Math.random() * 10);
+    bar.style.cssText = 'width:' + w + 'px;height:' + h + 'px';
+    bc.appendChild(bar);
+  }
+})();
+</script>
+</body>
+</html>

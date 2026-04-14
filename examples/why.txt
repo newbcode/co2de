@@ -1,0 +1,51 @@
+
+💨 co2de — Why 1.60g CO2?
+
+STEP 1: Token Count
+  Input:        12,451 tokens (prompt, context)
+  Output:      285,320 tokens (model responses)
+  Cache R:  12,845,210 tokens (reused context)
+  Cache W:     412,019 tokens (new context)
+  Total:    13,555,000 tokens
+
+STEP 2: Energy Consumption
+  Model: claude-opus-4-6 → 0.005 Wh/token
+  Full-price tokens: 709,790 × 0.005 = 3548.95 Wh
+  Cache-read tokens: 12,845,210 × 0.005 × 0.1 = 6422.61 Wh (90% discount)
+  PUE:   × 1.2 (datacenter overhead)
+  Total: 11965.87 Wh = 11.9659 kWh
+
+STEP 3: Carbon Emission
+  Region: us → 390 gCO2/kWh
+  CO2:    11.9659 × 390 = 1.60g CO2e
+
+MODEL SUGGESTION
+  If Sonnet:  ~0.80g (50% less)
+  If Haiku:   ~0.32g (80% less)
+  Was this model necessary for this task?
+
+COMPARISONS
+  🌳 A tree absorbs this in 2.3 seconds
+  🚗 Same as driving a car 13.3m
+  🔍 Equivalent to 8.0 Google searches
+  📱 0.20 smartphone charges
+  📺 2.7 minutes of Netflix streaming
+  💡 0.16 hours of an LED bulb
+
+REGIONAL IMPACT — Same tokens, different grids
+  Your region (us)    ████████████▍░░░░░░░   1.60g   390 gCO2/kWh
+  France (nuclear)    █▊░░░░░░░░░░░░░░░░░░   0.23g    55 gCO2/kWh  -86%
+  Norway (hydro)      ▍░░░░░░░░░░░░░░░░░░░   0.04g    10 gCO2/kWh  -97%
+  India (coal-heavy)  ████████████████████   2.59g   630 gCO2/kWh  +62%
+
+  Anthropic's US datacenter grid: ~390 gCO2/kWh.
+  Your region setting affects the DISPLAY only — actual emissions
+  depend on where the provider runs inference.
+
+Sources: IEA 2023, Luccioni et al. 2023, EPA 2024
+Coefficients are estimates. Run 'co2de config' to adjust.
+
+  NOTE
+  Token-based CO2 is an approximation (R²≈0.44 vs actual energy).
+  Inference time is a stronger predictor but unavailable via API.
+  Source: Mamun et al. 2026, arXiv:2604.02776

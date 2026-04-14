@@ -1,0 +1,10 @@
+
+  co2de — Carbon Tracker
+
+  SESSION   opus        13.5M tok   1.60g      $5.40   1.1g/line written
+  PROJECT   8 ses      52.3M tok   3.55g     $28.17
+
+  WEEK  Mo Tu We Th Fr Sa Su
+        █  ▁  ▃  ·  ▁  ▁  ▅
+
+  Total this week: 3.55g across 8 sessions

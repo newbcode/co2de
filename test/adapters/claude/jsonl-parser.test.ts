@@ -7,7 +7,7 @@ import {
   countLinesWritten,
   encodeProjectPath,
   getSessionSummary,
-} from "../../../src/adapters/claude/jsonl-parser.js";
+} from "../../../src/adapters/claude.js";
 
 const TEST_DIR = join(tmpdir(), "co2de-test-" + Date.now());
 

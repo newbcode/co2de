@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carbon Emissions Report — Past 7 Days</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FAFAF8;--card:#FFFFFF;--border:#E5E7EB;
+  --accent:#78350F;--amber:#B45309;--amber-light:#F59E0B;
+  --text:#1F2937;--muted:#6B7280;--dim:#9CA3AF;
+  --green:#22C55E;--red:#EF4444;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:system-ui,'Apple SD Gothic Neo','Segoe UI',sans-serif;
+  line-height:1.6;-webkit-font-smoothing:antialiased;
+}
+.report{max-width:960px;margin:0 auto;padding:40px 32px 60px}
+
+/* 1. Header */
+.header{
+  background:linear-gradient(135deg,#FFFBEB 0%,#FDE68A 100%);
+  border:1px solid #F59E0B;border-radius:12px;
+  padding:40px 48px;margin-bottom:40px;
+}
+.header-title{font-size:28px;font-weight:700;color:var(--accent);letter-spacing:-0.5px}
+.header-sub{font-size:14px;color:#92400E;margin-top:8px;line-height:1.8}
+.header-meta{display:flex;gap:24px;margin-top:12px;font-size:13px;color:#92400E}
+.header-meta span{display:flex;align-items:center;gap:4px}
+
+/* Section layout */
+.section{margin-bottom:36px}
+.section-head{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.section-num{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--accent);color:#FFF;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;flex-shrink:0;
+}
+.section-title{font-size:18px;font-weight:700;color:var(--accent)}
+
+/* KPI grid */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.kpi-card{
+  background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:24px;text-align:center;
+}
+.kpi-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.kpi-value{font-size:32px;font-weight:800;color:var(--accent);letter-spacing:-1px}
+.kpi-unit{font-size:14px;font-weight:400;color:var(--muted)}
+.kpi-sub{font-size:12px;color:var(--dim);margin-top:4px}
+
+/* Data table */
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table thead{background:#F9FAFB;border-bottom:2px solid var(--border)}
+.data-table th{
+  padding:10px 14px;text-align:left;font-size:11px;
+  color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;
+  cursor:pointer;user-select:none;white-space:nowrap;
+}
+.data-table th:hover{color:var(--accent)}
+.data-table th .sort-arrow{font-size:10px;margin-left:4px;opacity:0.4}
+.data-table th.sorted .sort-arrow{opacity:1;color:var(--amber)}
+.data-table td{padding:10px 14px;border-bottom:1px solid #F3F4F6}
+.data-table tbody tr:hover{background:#FFFBEB}
+.data-table tfoot td{padding:10px 14px;font-weight:700;border-top:2px solid var(--border)}
+
+/* Savings */
+.savings-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.savings-card{
+  background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;
+}
+.savings-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+.savings-desc{font-size:13px;color:var(--text);margin-bottom:8px}
+.savings-val{font-size:18px;font-weight:700;color:var(--green)}
+.savings-bar-outer{
+  height:16px;background:#F3F4F6;border-radius:8px;overflow:hidden;
+  display:flex;margin:12px 0;
+}
+.savings-bar-actual{background:var(--amber);height:100%;border-radius:8px 0 0 8px}
+.savings-bar-saved{background:var(--green);height:100%}
+
+/* Equiv grid */
+.equiv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.equiv-card{
+  background:var(--card);border:1px solid var(--border);border-radius:10px;
+  padding:24px;text-align:center;
+}
+.equiv-card svg{margin-bottom:8px}
+.equiv-val{font-size:22px;font-weight:800;color:var(--accent);letter-spacing:-0.5px}
+.equiv-desc{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.4}
+
+/* Methodology */
+.method-details{
+  background:var(--card);border:1px solid var(--border);border-radius:10px;
+  margin-bottom:8px;
+}
+.method-details summary{
+  padding:16px 20px;font-weight:600;font-size:14px;cursor:pointer;
+  color:var(--accent);list-style:none;
+}
+.method-details summary::-webkit-details-marker{display:none}
+.method-details summary::before{content:"+ ";font-weight:700;color:var(--amber)}
+.method-details[open] summary::before{content:"- "}
+.method-details .inner{padding:0 20px 20px;font-size:13px;color:var(--muted);line-height:1.7}
+.formula-box{
+  background:#F9FAFB;border:1px solid var(--border);border-radius:8px;
+  padding:16px 20px;font-family:'JetBrains Mono',monospace;font-size:12px;
+  color:var(--text);overflow-x:auto;margin:12px 0;white-space:pre;
+}
+.highlight-row{background:#FFFBEB !important}
+.method-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+.method-table th{text-align:left;padding:8px 12px;color:var(--muted);font-size:11px;text-transform:uppercase;border-bottom:1px solid var(--border)}
+.method-table td{padding:8px 12px;border-bottom:1px solid #F3F4F6}
+.method-table tbody tr:hover{background:#FFFBEB}
+
+/* Show all button */
+.show-all-btn{
+  display:block;margin:16px auto;padding:8px 24px;
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  font-size:13px;color:var(--accent);cursor:pointer;font-weight:600;
+}
+.show-all-btn:hover{background:#FFFBEB;border-color:var(--amber)}
+
+/* Footer */
+.footer{
+  text-align:center;padding:32px 0 16px;border-top:1px solid var(--border);
+  margin-top:40px;font-size:12px;color:var(--dim);line-height:1.8;
+}
+.footer strong{color:var(--accent);font-weight:700}
+
+/* Print */
+@media print{
+  body{background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .report{max-width:100%;padding:20px}
+  .header{break-after:avoid}
+  .section{break-inside:avoid}
+  .show-all-btn{display:none !important}
+  .session-hidden{display:table-row !important}
+  .data-table th{cursor:default}
+  .equiv-card:hover,.data-table tbody tr:hover{background:transparent}
+}
+
+@media(max-width:640px){
+  .report{padding:20px 16px}
+  .header{padding:28px 24px}
+  .kpi-grid{grid-template-columns:1fr 1fr}
+  .equiv-grid{grid-template-columns:1fr 1fr}
+  .savings-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="report">
+
+  <!-- 1. Header -->
+  <div class="header">
+    <div class="header-title">Carbon Emissions Report</div>
+    <div class="header-sub">Estimated CO2 footprint from AI-assisted development</div>
+    <div class="header-meta">
+      <span>Period: 2026-04-07 to 2026-04-13</span>
+      <span>Generated: 2026-04-14</span>
+      <span>Region: US</span>
+      <span>co2de v0.1.0</span>
+    </div>
+  </div>
+
+  <!-- 2. Executive Summary -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">1</div>
+      <div class="section-title">Executive Summary</div>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Estimated CO2</div>
+        <div class="kpi-value">~3.55<span class="kpi-unit">g</span></div>
+        <div class="kpi-sub">gCO2 equivalent</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Energy</div>
+        <div class="kpi-value">9.10<span class="kpi-unit">Wh</span></div>
+        <div class="kpi-sub">compute + PUE overhead</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Sessions</div>
+        <div class="kpi-value">8</div>
+        <div class="kpi-sub">AI interactions</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Tokens</div>
+        <div class="kpi-value">52.3M</div>
+        <div class="kpi-sub">total processed</div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:16px;font-size:14px;color:var(--muted)">
+      8 sessions across 5 active days
+    </div>
+  </div>
+
+  <!-- 3. Emissions Timeline -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">2</div>
+      <div class="section-title">Emissions Timeline</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;overflow-x:auto">
+      <svg viewBox="0 0 880 200" width="100%" height="200" xmlns="http://www.w3.org/2000/svg" style="display:block">
+        <!-- Grid lines -->
+        <line x1="50" y1="160" x2="860" y2="160" stroke="#E5E7EB" stroke-width="1"/>
+        <text x="42" y="164" text-anchor="end" fill="#9CA3AF" font-size="11" font-family="system-ui">0g</text>
+        <line x1="50" y1="125" x2="860" y2="125" stroke="#E5E7EB" stroke-width="1"/>
+        <text x="42" y="129" text-anchor="end" fill="#9CA3AF" font-size="11" font-family="system-ui">0.40g</text>
+        <line x1="50" y1="90" x2="860" y2="90" stroke="#E5E7EB" stroke-width="1"/>
+        <text x="42" y="94" text-anchor="end" fill="#9CA3AF" font-size="11" font-family="system-ui">0.80g</text>
+        <line x1="50" y1="55" x2="860" y2="55" stroke="#E5E7EB" stroke-width="1"/>
+        <text x="42" y="59" text-anchor="end" fill="#9CA3AF" font-size="11" font-family="system-ui">1.20g</text>
+        <line x1="50" y1="20" x2="860" y2="20" stroke="#E5E7EB" stroke-width="1"/>
+        <text x="42" y="24" text-anchor="end" fill="#9CA3AF" font-size="11" font-family="system-ui">1.60g</text>
+
+        <!-- Apr 07: 0.93g -->
+        <rect x="50" y="78.6" width="40" height="81.4" rx="2" fill="#B45309" opacity="0.75">
+          <title>2026-04-07: ~0.93g CO2</title>
+        </rect>
+        <text x="70" y="73.6" text-anchor="middle" fill="#78350F" font-size="9" font-family="system-ui">~0.93</text>
+        <text x="70" y="192" text-anchor="middle" fill="#9CA3AF" font-size="10" font-family="system-ui">04-07</text>
+
+        <!-- Apr 08: 0.02g -->
+        <rect x="185" y="158.3" width="40" height="1.8" rx="2" fill="#B45309" opacity="0.75">
+          <title>2026-04-08: ~0.02g CO2</title>
+        </rect>
+        <text x="205" y="153.3" text-anchor="middle" fill="#78350F" font-size="9" font-family="system-ui">~0.02</text>
+        <text x="205" y="192" text-anchor="middle" fill="#9CA3AF" font-size="10" font-family="system-ui">04-08</text>
+
+        <!-- Apr 09: 0.74g -->
+        <rect x="320" y="95.3" width="40" height="64.8" rx="2" fill="#B45309" opacity="0.75">
+          <title>2026-04-09: ~0.74g CO2</title>
+        </rect>
+        <text x="340" y="90.3" text-anchor="middle" fill="#78350F" font-size="9" font-family="system-ui">~0.74</text>
+        <text x="340" y="192" text-anchor="middle" fill="#9CA3AF" font-size="10" font-family="system-ui">04-09</text>
+
+        <!-- Apr 10: 0 (no bar) -->
+        <text x="475" y="192" text-anchor="middle" fill="#9CA3AF" font-size="10" font-family="system-ui">04-10</text>
+
+        <!-- Apr 11: 0.22g -->
+        <rect x="590" y="140.8" width="40" height="19.3" rx="2" fill="#B45309" opacity="0.75">
+          <title>2026-04-11: ~0.22g CO2</title>
+        </rect>
+        <text x="610" y="135.8" text-anchor="middle" fill="#78350F" font-size="9" font-family="system-ui">~0.22</text>
+        <text x="610" y="192" text-anchor="middle" fill="#9CA3AF" font-size="10" font-family="system-ui">04-11</text>
+
+        <!-- Apr 12: 0.04g -->
+        <rect x="725" y="156.5" width="40" height="3.5" rx="2" fill="#B45309" opacity="0.75">
+          <title>2026-04-12: ~0.04g CO2</title>
+        </rect>
+        <text x="745" y="151.5" text-anchor="middle" fill="#78350F" font-size="9" font-family="system-ui">~0.04</text>
+        <text x="745" y="192" text-anchor="middle" fill="#9CA3AF" font-size="10" font-family="system-ui">04-12</text>
+
+        <!-- Apr 13: 1.60g -->
+        <rect x="820" y="20" width="40" height="140" rx="2" fill="#B45309" opacity="0.75">
+          <title>2026-04-13: ~1.60g CO2</title>
+        </rect>
+        <text x="840" y="15" text-anchor="middle" fill="#78350F" font-size="9" font-family="system-ui">~1.60</text>
+        <text x="840" y="192" text-anchor="middle" fill="#9CA3AF" font-size="10" font-family="system-ui">04-13</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- 4. Model Breakdown -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">3</div>
+      <div class="section-title">Model Breakdown</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px">
+      <div style="height:12px;border-radius:6px;overflow:hidden;display:flex;margin-bottom:20px">
+        <div style="width:38%;background:#78350F;height:100%;display:inline-block" title="Opus: 38%"></div>
+        <div style="width:42%;background:#bf5af2;height:100%;display:inline-block" title="Sonnet: 42%"></div>
+        <div style="width:20%;background:#64d2ff;height:100%;display:inline-block" title="Haiku: 20%"></div>
+      </div>
+      <table class="data-table">
+        <thead><tr>
+          <th>Model</th><th style="text-align:right">Sessions</th><th style="text-align:right">Tokens</th>
+          <th style="text-align:right">~CO2</th><th style="text-align:right">Share</th><th style="text-align:right">Energy Rate</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#78350F;margin-right:8px;vertical-align:middle"></span>Opus</td>
+            <td style="text-align:right">3</td>
+            <td style="text-align:right">34.5M</td>
+            <td style="text-align:right">~1.35g</td>
+            <td style="text-align:right">38.0%</td>
+            <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px">0.005 Wh</td>
+          </tr>
+          <tr>
+            <td><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#bf5af2;margin-right:8px;vertical-align:middle"></span>Sonnet</td>
+            <td style="text-align:right">3</td>
+            <td style="text-align:right">13.8M</td>
+            <td style="text-align:right">~1.49g</td>
+            <td style="text-align:right">42.0%</td>
+            <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px">0.0025 Wh</td>
+          </tr>
+          <tr>
+            <td><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#64d2ff;margin-right:8px;vertical-align:middle"></span>Haiku</td>
+            <td style="text-align:right">2</td>
+            <td style="text-align:right">4.0M</td>
+            <td style="text-align:right">~0.71g</td>
+            <td style="text-align:right">20.0%</td>
+            <td style="text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px">0.001 Wh</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 5. Efficiency & Savings -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">4</div>
+      <div class="section-title">Efficiency & Savings</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px">
+        <span style="font-size:14px;color:var(--muted)">Actual vs Worst-Case</span>
+        <span style="font-size:28px;font-weight:800;color:var(--green)">77% saved</span>
+      </div>
+      <div class="savings-bar-outer">
+        <div class="savings-bar-actual" style="width:23%"></div>
+        <div class="savings-bar-saved" style="width:77%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-top:8px">
+        <span>Actual: <strong style="color:var(--text)">~3.55g</strong></span>
+        <span>Worst-case: <strong style="color:var(--text)">~15.12g</strong></span>
+        <span>Saved: <strong style="color:var(--green)">~11.57g</strong></span>
+      </div>
+      <div style="font-size:12px;color:var(--dim);margin-top:8px">Worst-case = all tokens processed as Opus (highest energy model)</div>
+    </div>
+
+  </div>
+
+  <!-- 6. Real-World Equivalents -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">5</div>
+      <div class="section-title">Real-World Equivalents</div>
+    </div>
+    <div class="equiv-grid">
+      <div class="equiv-card"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect x="6" y="18" width="28" height="10" rx="3" fill="#78350F" opacity="0.7"/><rect x="10" y="12" width="20" height="8" rx="2" fill="#78350F" opacity="0.5"/><circle cx="13" cy="30" r="3" fill="#78350F"/><circle cx="27" cy="30" r="3" fill="#78350F"/></svg><div class="equiv-val">29.6 m</div><div class="equiv-desc">car driving distance</div></div>
+      <div class="equiv-card"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect x="12" y="4" width="16" height="32" rx="3" stroke="#78350F" stroke-width="2" opacity="0.7"/><rect x="14" y="8" width="12" height="20" rx="1" fill="#78350F" opacity="0.2"/><circle cx="20" cy="32" r="1.5" fill="#78350F" opacity="0.7"/></svg><div class="equiv-val">0.4</div><div class="equiv-desc">phone charges</div></div>
+      <div class="equiv-card"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect x="4" y="8" width="32" height="22" rx="3" stroke="#78350F" stroke-width="2" opacity="0.7"/><polygon points="17,14 17,24 26,19" fill="#78350F" opacity="0.5"/><line x1="14" y1="34" x2="26" y2="34" stroke="#78350F" stroke-width="2" stroke-linecap="round" opacity="0.7"/></svg><div class="equiv-val">5.9 min</div><div class="equiv-desc">Netflix streaming</div></div>
+      <div class="equiv-card"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><ellipse cx="20" cy="16" rx="10" ry="12" fill="#78350F" opacity="0.2"/><path d="M14 24h12v4c0 2-2 4-6 4s-6-2-6-4v-4z" fill="#78350F" opacity="0.5"/><line x1="20" y1="4" x2="20" y2="2" stroke="#B45309" stroke-width="1.5" stroke-linecap="round"/><line x1="28" y1="8" x2="30" y2="6" stroke="#B45309" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="8" x2="10" y2="6" stroke="#B45309" stroke-width="1.5" stroke-linecap="round"/></svg><div class="equiv-val">0.36 hrs</div><div class="equiv-desc">LED bulb runtime</div></div>
+      <div class="equiv-card"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="18" cy="18" r="10" stroke="#78350F" stroke-width="2.5" opacity="0.7"/><line x1="25" y1="25" x2="34" y2="34" stroke="#78350F" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/></svg><div class="equiv-val">18</div><div class="equiv-desc">Google searches</div></div>
+    </div>
+  </div>
+
+  <!-- 7. Session Detail -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">6</div>
+      <div class="section-title">Session Detail</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden">
+      <table class="data-table" id="sessionTable">
+        <thead><tr>
+          <th data-col="0" data-type="num"># <span class="sort-arrow">&#9650;</span></th>
+          <th data-col="1" data-type="str">ID <span class="sort-arrow">&#9650;</span></th>
+          <th data-col="2" data-type="str">Date <span class="sort-arrow">&#9650;</span></th>
+          <th data-col="3" data-type="str">Model <span class="sort-arrow">&#9650;</span></th>
+          <th data-col="4" data-type="num" style="text-align:right">Tokens <span class="sort-arrow">&#9650;</span></th>
+          <th data-col="5" data-type="num" style="text-align:right">~CO2 <span class="sort-arrow">&#9650;</span></th>
+          <th data-col="6" data-type="num" style="text-align:right">Cost <span class="sort-arrow">&#9650;</span></th>
+          <th style="text-align:center">Eff.</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td style="font-family:'JetBrains Mono',monospace;font-size:12px">a1b2c3d4</td>
+            <td>2026-04-07 09:15</td>
+            <td>Opus</td>
+            <td style="text-align:right">12.3M</td>
+            <td style="text-align:right;font-weight:600">~0.82g</td>
+            <td style="text-align:right">$8.20</td>
+            <td style="text-align:center"><svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="#EF4444"/></svg></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td style="font-family:'JetBrains Mono',monospace;font-size:12px">e5f6a7b8</td>
+            <td>2026-04-07 14:30</td>
+            <td>Sonnet</td>
+            <td style="text-align:right">3.1M</td>
+            <td style="text-align:right;font-weight:600">~0.11g</td>
+            <td style="text-align:right">$1.85</td>
+            <td style="text-align:center"><svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="#22C55E"/></svg></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td style="font-family:'JetBrains Mono',monospace;font-size:12px">c9d0e1f2</td>
+            <td>2026-04-08 10:00</td>
+            <td>Haiku</td>
+            <td style="text-align:right">1.2M</td>
+            <td style="text-align:right;font-weight:600">~0.02g</td>
+            <td style="text-align:right">$0.12</td>
+            <td style="text-align:center"><svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="#22C55E"/></svg></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td style="font-family:'JetBrains Mono',monospace;font-size:12px">a3b4c5d6</td>
+            <td>2026-04-09 09:45</td>
+            <td>Sonnet</td>
+            <td style="text-align:right">4.5M</td>
+            <td style="text-align:right;font-weight:600">~0.16g</td>
+            <td style="text-align:right">$2.70</td>
+            <td style="text-align:center"><svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="#22C55E"/></svg></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td style="font-family:'JetBrains Mono',monospace;font-size:12px">e7f8a9b0</td>
+            <td>2026-04-09 15:20</td>
+            <td>Opus</td>
+            <td style="text-align:right">8.7M</td>
+            <td style="text-align:right;font-weight:600">~0.58g</td>
+            <td style="text-align:right">$5.90</td>
+            <td style="text-align:center"><svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="#EF4444"/></svg></td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td style="font-family:'JetBrains Mono',monospace;font-size:12px">c1d2e3f4</td>
+            <td>2026-04-11 11:00</td>
+            <td>Sonnet</td>
+            <td style="text-align:right">6.2M</td>
+            <td style="text-align:right;font-weight:600">~0.22g</td>
+            <td style="text-align:right">$3.72</td>
+            <td style="text-align:center"><svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="#F59E0B"/></svg></td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td style="font-family:'JetBrains Mono',monospace;font-size:12px">a5b6c7d8</td>
+            <td>2026-04-12 16:45</td>
+            <td>Haiku</td>
+            <td style="text-align:right">2.8M</td>
+            <td style="text-align:right;font-weight:600">~0.04g</td>
+            <td style="text-align:right">$0.28</td>
+            <td style="text-align:center"><svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="#22C55E"/></svg></td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td style="font-family:'JetBrains Mono',monospace;font-size:12px">e9f0a1b2</td>
+            <td>2026-04-13 10:30</td>
+            <td>Opus</td>
+            <td style="text-align:right">13.5M</td>
+            <td style="text-align:right;font-weight:600">~1.60g</td>
+            <td style="text-align:right">$5.40</td>
+            <td style="text-align:center"><svg width="10" height="10"><circle cx="5" cy="5" r="5" fill="#EF4444"/></svg></td>
+          </tr>
+        </tbody>
+        <tfoot><tr>
+          <td colspan="4" style="text-align:right">TOTAL</td>
+          <td style="text-align:right">52.3M</td>
+          <td style="text-align:right">~3.55g</td>
+          <td style="text-align:right">$28.17</td>
+          <td></td>
+        </tr></tfoot>
+      </table>
+
+    </div>
+  </div>
+
+  <!-- 8. Methodology -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">7</div>
+      <div class="section-title">Methodology</div>
+    </div>
+
+    <details class="method-details">
+      <summary>Calculation Pipeline</summary>
+      <div class="inner">
+        <div class="formula-box">CO2 (gCO2e) = (tokens x Wh/token x PUE) / 1000 x carbon_intensity
+
+Where:
+  tokens           = input + output + cache_read + cache_write
+  Wh/token         = model-specific (see table below)
+  PUE              = 1.2 (datacenter overhead multiplier)
+  carbon_intensity = 390 gCO2/kWh (US)</div>
+        <p style="margin-top:8px">Token count explains ~44% of energy variance (R²≈0.44). Inference time is a stronger predictor but unavailable via API.</p>
+      </div>
+    </details>
+
+    <details class="method-details">
+      <summary>Energy per Token</summary>
+      <div class="inner">
+        <table class="method-table">
+          <thead><tr><th>Model</th><th style="text-align:right">Wh/token</th></tr></thead>
+          <tbody>
+            <tr><td>claude-opus</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">0.005</td></tr>
+            <tr><td>claude-sonnet</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">0.0025</td></tr>
+            <tr><td>claude-haiku</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">0.001</td></tr>
+            <tr><td>gemini-pro</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">0.004</td></tr>
+            <tr><td>gemini-flash</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">0.0015</td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:12px;color:var(--dim);margin-top:8px">Based on Luccioni et al. (2023). Conservative upper-bound estimates.</p>
+      </div>
+    </details>
+
+    <details class="method-details">
+      <summary>Regional Carbon Intensity</summary>
+      <div class="inner">
+        <table class="method-table">
+          <thead><tr><th>Region</th><th style="text-align:right">gCO2/kWh</th></tr></thead>
+          <tbody>
+            <tr><td>NO</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">10</td></tr>
+            <tr><td>SE</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">25</td></tr>
+            <tr><td>FR</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">55</td></tr>
+            <tr><td>BR</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">75</td></tr>
+            <tr><td>CA</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">120</td></tr>
+            <tr><td>UK</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">210</td></tr>
+            <tr><td>EU</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">230</td></tr>
+            <tr><td>DE</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">350</td></tr>
+            <tr class="highlight-row"><td>US</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">390</td></tr>
+            <tr><td>KR</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">415</td></tr>
+            <tr><td>JP</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">450</td></tr>
+            <tr><td>GLOBAL</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">475</td></tr>
+            <tr><td>AU</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">510</td></tr>
+            <tr><td>CN</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">555</td></tr>
+            <tr><td>IN</td><td style="text-align:right;font-family:'JetBrains Mono',monospace">630</td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:12px;color:var(--dim);margin-top:8px">Source: IEA 2023. Your region (US) is highlighted.</p>
+      </div>
+    </details>
+
+    <details class="method-details">
+      <summary>Sources & Limitations</summary>
+      <div class="inner">
+        <p style="margin-bottom:8px"><strong style="color:var(--text)">Sources</strong></p>
+        <div style="padding-left:12px;line-height:2">
+          — IEA (2023). Electricity 2024.<br>
+          — Luccioni et al. (2023). Power Hungry Processing.<br>
+          — Mamun et al. (2026). arXiv:2604.02776. Token-energy correlation (R²≈0.44).<br>
+          — Patterson et al. (2021). Carbon Emissions and Large Neural Networks.<br>
+          — EPA (2024). Greenhouse Gas Equivalencies Calculator.<br>
+          — Uptime Institute (2023). Global Data Center Survey.
+        </div>
+        <p style="margin-top:12px;margin-bottom:8px"><strong style="color:var(--text)">Limitations</strong></p>
+        <div style="padding-left:12px;line-height:2">
+          — Token-energy correlation is moderate (R²≈0.44).<br>
+          — Actual GPU hardware and batch sizes unknown.<br>
+          — Exact datacenter location and real-time grid intensity unknown.<br>
+          — Embodied carbon (manufacturing) not included.<br>
+          — We use conservative upper-bound estimates.
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <!-- 9. Footer -->
+  <div class="footer">
+    <div><strong>Generated by co2de v0.1.0</strong></div>
+    <div>Sources: IEA 2023, Luccioni et al. 2023, Mamun et al. 2026 (arXiv:2604.02776) | Token-based CO2 is an approximation (R² ≈ 0.44)</div>
+  </div>
+
+</div>
+
+<script>
+/* Table sorting */
+(function(){
+  var table = document.getElementById('sessionTable');
+  if (!table) return;
+  var headers = table.querySelectorAll('thead th[data-col]');
+  var tbody = table.querySelector('tbody');
+  var sortCol = -1, sortAsc = true;
+
+  headers.forEach(function(th){
+    th.addEventListener('click', function(){
+      var col = parseInt(th.getAttribute('data-col'));
+      var type = th.getAttribute('data-type');
+      if (sortCol === col) { sortAsc = !sortAsc; } else { sortCol = col; sortAsc = true; }
+
+      headers.forEach(function(h){ h.classList.remove('sorted'); });
+      th.classList.add('sorted');
+      th.querySelector('.sort-arrow').innerHTML = sortAsc ? '&#9650;' : '&#9660;';
+
+      var rows = Array.from(tbody.querySelectorAll('tr'));
+      rows.sort(function(a, b){
+        var aVal = a.cells[col].textContent.trim();
+        var bVal = b.cells[col].textContent.trim();
+        if (type === 'num') {
+          var aNum = parseFloat(aVal.replace(/[^0-9.\-]/g, '')) || 0;
+          var bNum = parseFloat(bVal.replace(/[^0-9.\-]/g, '')) || 0;
+          return sortAsc ? aNum - bNum : bNum - aNum;
+        }
+        return sortAsc ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+      });
+      rows.forEach(function(r){ tbody.appendChild(r); });
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+
+  co2de Configuration
+
+  region:         us (390 gCO2/kWh)
+  daily_budget:   10g
+
+  Available regions: global, us, eu, uk, de, fr, se, no, kr, jp, cn, in, au, ca, br
+
+  Shortcuts:
+    co2de config <region>          set region (e.g. co2de config kr)
+    co2de config set budget 50     set daily budget
+    co2de config set budget 0      clear budget

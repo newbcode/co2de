@@ -1,0 +1,14 @@
+
+  CARBON AUDIT — Efficiency Analysis  session a1b2c3d
+
+  FINDINGS
+  SEV  PATTERN               POTENTIAL DESCRIPTION
+  ───  ───────────────────   ────────  ─────────────────────────
+  ●●●  Model over-selection   -0.56g   8 of 12 responses were simple (<500 output tokens) but used an expensive model
+  ●●   Context bloat          -0.21g   Input tokens grew 4.2x over 42 messages (3,102 → 13,028)
+  ●    Redundant file reads  -0.001g   2 files read 3+ times: page.tsx (5x), layout.tsx (3x)
+
+  TOTAL POTENTIAL SAVINGS: 0.77g (48% of session)
+  ██████████░░░░░░░░░░░ 48% recoverable
+
+  TIP: Run `co2de compare` to see AI vs hand-coding impact.

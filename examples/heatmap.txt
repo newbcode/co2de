@@ -1,0 +1,16 @@
+
+💨 CO2 Heatmap — Past 30 Days
+
+  Apr 2026
+  Mo  ░ ░ ░ ▒ ░ ▓
+  Tu  ░ ░     ░
+  We    ░ ▒ ░ ░ ▒
+  Th  ░   ░ ░
+  Fr      ░ ░ ░
+  Sa  ░ ░   ░
+  Su        ░   █
+
+  ░ <0.46g  ▒ <0.93g  ▓ <1.39g  █ 1.39g+
+
+  Total: ~10.2g | avg ~0.38g/day
+  Heaviest: 2026-04-13 (~1.60g)
