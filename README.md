@@ -20,7 +20,10 @@
 ## Install
 
 ```bash
-npm install -g co2de
+git clone https://github.com/newbcode/co2de.git
+cd co2de
+npm install && npm run build
+npm link
 ```
 
 Then initialize the statusline integration:
