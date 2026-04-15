@@ -2,7 +2,7 @@
 💨 co2de Badge Generator
 
   Project: nextjs-blog
-  Total CO2: ~3.55g
+  Total CO₂: ~3.55g
   Sessions: 8
 
   Badge for your README.md:

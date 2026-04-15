@@ -1,7 +1,7 @@
 
   co2de Configuration
 
-  region:         us (390 gCO2/kWh)
+  region:         us (390 gCO₂/kWh)
   daily_budget:   10g
 
   Available regions: global, us, eu, uk, de, fr, se, no, kr, jp, cn, in, au, ca, br

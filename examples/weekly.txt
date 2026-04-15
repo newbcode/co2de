@@ -2,7 +2,7 @@
   WEEKLY CARBON REPORT
   Apr  7 → Apr 13
 
-  DATE        SESSIONS     TOKENS        CO2      COST
+  DATE        SESSIONS     TOKENS        CO₂      COST
   ──────────  ────────   ────────   ────────  ────────  ────────────────
   Mon Apr  7         2     15.4M     0.93g    $10.05  ████████████████
   Tue Apr  8         1      1.2M     0.02g     $0.12  ▎░░░░░░░░░░░░░░░

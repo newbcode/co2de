@@ -1,20 +1,20 @@
 
-  CO2 EMISSION LEDGER
+  CO₂ EMISSION LEDGER
   2026-04-07 → 2026-04-13
 
 ╔══════════════════════════════════════════════════════════════╗
-║ COST      $28.17     CO2      ~3.55g     CACHE  93%          ║
+║ COST      $28.17     CO₂      ~3.55g     CACHE  93%          ║
 ║ 8 ses · 1 proj · 52.3M tok             █████████▎            ║
 ╚══════════════════════════════════════════════════════════════╝
 
-  PROJECT                SES    TOKENS      COST       CO2   HIT  EMISSION
+  PROJECT                SES    TOKENS      COST       CO₂   HIT  EMISSION
   ────────────────────── ───  ────────  ────────  ────────  ────  ────────────────
   nextjs-blog              8     52.3M    $28.17     3.55g   93%  ████████████████
   ────────────────────── ───  ────────  ────────  ────────  ────  ────────────────
   TOTAL                    8     52.3M    $28.17     3.55g   93%
 
   SESSION DETAIL
-    #  DATE    MODEL      TOKENS       IN      OUT       CW       CR     COST      CO2   HIT
+    #  DATE    MODEL      TOKENS       IN      OUT       CW       CR     COST      CO₂   HIT
   ────────────────────────────────────────────────────────────────────────────────────────────
   ···  nextjs-blog  — $28.17 · 3.55g · 8 ses
     1  Apr 13  opus        13.5M     8.2K   285.3K   412.0K    12.8M    $5.40    1.60g   88%  ████████████
@@ -32,7 +32,7 @@
   haiku    ████░░░░░░░░░░░░░░░░░░░░░░   $0.40     4.0M tok   0.06g
 
   INSIGHTS
-  ● Heaviest session: nextjs-blog Apr 13 — 1.60g CO2
+  ● Heaviest session: nextjs-blog Apr 13 — 1.60g CO₂
   ● Most expensive: nextjs-blog Apr  7 — $8.20
   ● Lowest cache hit: nextjs-blog Apr 13 — 88% (keep stable system prompts)
   ● Avg per session: ~0.44g

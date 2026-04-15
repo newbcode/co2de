@@ -1,7 +1,7 @@
 
   SESSION LOG — Past 7 Days
 
-    #  TIME          MODEL      TOKENS      COST       CO2
+    #  TIME          MODEL      TOKENS      COST       CO₂
   ───  ────────────  ───────  ────────  ────────  ────────  ────────────
     1  1d ago        opus        13.5M     $5.40    1.60g  ████████████
     2  2d ago        haiku        2.8M     $0.28    0.04g  ▎░░░░░░░░░░░

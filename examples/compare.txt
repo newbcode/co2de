@@ -4,19 +4,19 @@
   ~1,456 lines written with AI assistance
 
   AI coding:
-    ~1.60g CO2  (~0.0011g/line)
+    ~1.60g CO₂  (~0.0011g/line)
     13,555,000 tokens over 42 min (wall clock, includes idle)
 
   Hand coding estimate:
-    ~0.095g CO2  (~0.000065g/line)
+    ~0.095g CO₂  (~0.000065g/line)
     ~8.1 hours (laptop 30W only, typing at 3 lines/min)
 
   Hand  █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0.095g
   AI    ██████████████████████████████  1.60g
 
-  AI: ~17x more CO2, ~12x faster
+  AI: ~17x more CO₂, ~12x faster
 
   Caveats:
-  AI CO2 includes all tokens (conversation, file reads, thinking)
-  Hand CO2 = laptop only. Real dev includes monitor, IDE, browsing
+  AI CO₂ includes all tokens (conversation, file reads, thinking)
+  Hand CO₂ = laptop only. Real dev includes monitor, IDE, browsing
   Hand time = raw typing speed. Real dev is 3-10x slower

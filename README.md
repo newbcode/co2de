@@ -10,11 +10,11 @@
 
 > Track the carbon cost of vibe coding, one token at a time.
 
-**co2de** is a CLI tool that estimates and visualizes the carbon footprint of AI-assisted development. Every token processed by large language models consumes energy, which produces CO2 emissions. co2de makes this invisible cost visible.
+**co2de** is a CLI tool that estimates and visualizes the carbon footprint of AI-assisted development. Every token processed by large language models consumes energy, which produces CO₂ emissions. co2de makes this invisible cost visible.
 
 - Reads token usage directly from Claude Code session files
 - Calculates energy with model-specific coefficients and cache discount
-- Converts to CO2 using regional grid carbon intensity
+- Converts to CO₂ using regional grid carbon intensity
 - No API keys, no network calls — everything runs locally
 
 ## Install
@@ -32,7 +32,7 @@ Then initialize the statusline integration:
 co2de init
 ```
 
-This patches your Claude Code statusline to show real-time CO2:
+This patches your Claude Code statusline to show real-time CO₂:
 
 ![statusline](examples/screenshot-status-line.png)
 
@@ -45,7 +45,7 @@ co2de
 # Detailed token usage — the main dashboard
 co2de usage
 
-# Why was this much CO2 emitted? Full calculation breakdown
+# Why was this much CO₂ emitted? Full calculation breakdown
 co2de why
 
 # AI coding vs hand coding comparison
@@ -82,22 +82,22 @@ $ co2de
 ```console
 $ co2de usage
 
-  CO2 EMISSION LEDGER
+  CO₂ EMISSION LEDGER
   2026-04-07 → 2026-04-13
 
 ╔══════════════════════════════════════════════════════════════╗
-║ COST      $28.17     CO2      ~3.55g     CACHE  93%          ║
+║ COST      $28.17     CO₂      ~3.55g     CACHE  93%          ║
 ║ 8 ses · 1 proj · 52.3M tok             █████████▎            ║
 ╚══════════════════════════════════════════════════════════════╝
 
-  PROJECT                SES    TOKENS      COST       CO2   HIT  EMISSION
+  PROJECT                SES    TOKENS      COST       CO₂   HIT  EMISSION
   ────────────────────── ───  ────────  ────────  ────────  ────  ────────────────
   nextjs-blog              8     52.3M    $28.17     3.55g   93%  ████████████████
   ────────────────────── ───  ────────  ────────  ────────  ────  ────────────────
   TOTAL                    8     52.3M    $28.17     3.55g   93%
 
   SESSION DETAIL
-    #  DATE    MODEL      TOKENS       IN      OUT       CW       CR     COST      CO2   HIT
+    #  DATE    MODEL      TOKENS       IN      OUT       CW       CR     COST      CO₂   HIT
   ···  nextjs-blog  — $28.17 · 3.55g · 8 ses
     1  Apr 13  opus        13.5M     8.2K   285.3K   412.0K    12.8M    $5.40    1.60g   88%  ████████████
     2  Apr 12  haiku        2.8M     1.4K    42.1K    85.3K     2.7M    $0.28    0.04g   91%  ▎░░░░░░░░░░░
@@ -114,7 +114,7 @@ $ co2de usage
   haiku    ████░░░░░░░░░░░░░░░░░░░░░░   $0.40     4.0M tok   0.06g
 
   INSIGHTS
-  ● Heaviest session: nextjs-blog Apr 13 — 1.60g CO2
+  ● Heaviest session: nextjs-blog Apr 13 — 1.60g CO₂
   ● Most expensive: nextjs-blog Apr  7 — $8.20
   ● Lowest cache hit: nextjs-blog Apr 13 — 88% (keep stable system prompts)
   ● Avg per session: ~0.44g
@@ -128,7 +128,7 @@ $ co2de usage
 ```console
 $ co2de why
 
-💨 co2de — Why 1.60g CO2?
+💨 co2de — Why 1.60g CO₂?
 
 STEP 1: Token Count
   Input:        12,451 tokens (prompt, context)
@@ -145,21 +145,21 @@ STEP 2: Energy Consumption
   Total: 11965.87 Wh = 11.9659 kWh
 
 STEP 3: Carbon Emission
-  Region: us → 390 gCO2/kWh
-  CO2:    11.9659 × 390 = 1.60g CO2e
+  Region: us → 390 gCO₂/kWh
+  CO₂:    11.9659 × 390 = 1.60g CO₂e
 
 MODEL SUGGESTION
   If Sonnet:  ~0.80g (50% less)
   If Haiku:   ~0.32g (80% less)
 
 REGIONAL IMPACT — Same tokens, different grids
-  Your region (us)    ████████████▍░░░░░░░   1.60g   390 gCO2/kWh
-  France (nuclear)    █▊░░░░░░░░░░░░░░░░░░   0.23g    55 gCO2/kWh  -86%
-  Norway (hydro)      ▍░░░░░░░░░░░░░░░░░░░   0.04g    10 gCO2/kWh  -97%
-  India (coal-heavy)  ████████████████████   2.59g   630 gCO2/kWh  +62%
+  Your region (us)    ████████████▍░░░░░░░   1.60g   390 gCO₂/kWh
+  France (nuclear)    █▊░░░░░░░░░░░░░░░░░░   0.23g    55 gCO₂/kWh  -86%
+  Norway (hydro)      ▍░░░░░░░░░░░░░░░░░░░   0.04g    10 gCO₂/kWh  -97%
+  India (coal-heavy)  ████████████████████   2.59g   630 gCO₂/kWh  +62%
 
   NOTE
-  Token-based CO2 is an approximation (R²≈0.44 vs actual energy).
+  Token-based CO₂ is an approximation (R²≈0.44 vs actual energy).
   Source: Mamun et al. 2026, arXiv:2604.02776
 ```
 
@@ -202,21 +202,21 @@ $ co2de compare
   ~1,456 lines written with AI assistance
 
   AI coding:
-    ~1.60g CO2  (~0.0011g/line)
+    ~1.60g CO₂  (~0.0011g/line)
     13,555,000 tokens over 42 min (wall clock, includes idle)
 
   Hand coding estimate:
-    ~0.095g CO2  (~0.000065g/line)
+    ~0.095g CO₂  (~0.000065g/line)
     ~8.1 hours (laptop 30W only, typing at 3 lines/min)
 
   Hand  █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0.095g
   AI    ██████████████████████████████  1.60g
 
-  AI: ~17x more CO2, ~12x faster
+  AI: ~17x more CO₂, ~12x faster
 
   Caveats:
-  AI CO2 includes all tokens (conversation, file reads, thinking)
-  Hand CO2 = laptop only. Real dev includes monitor, IDE, browsing
+  AI CO₂ includes all tokens (conversation, file reads, thinking)
+  Hand CO₂ = laptop only. Real dev includes monitor, IDE, browsing
   Hand time = raw typing speed. Real dev is 3-10x slower
 ```
 
@@ -230,7 +230,7 @@ $ co2de log
 
   SESSION LOG — Past 7 Days
 
-    #  TIME          MODEL      TOKENS      COST       CO2
+    #  TIME          MODEL      TOKENS      COST       CO₂
   ───  ────────────  ───────  ────────  ────────  ────────  ────────────
     1  1d ago        opus        13.5M     $5.40    1.60g  ████████████
     2  2d ago        haiku        2.8M     $0.28    0.04g  ▎░░░░░░░░░░░
@@ -248,7 +248,7 @@ $ co2de weekly
   WEEKLY CARBON REPORT
   Apr  7 → Apr 13
 
-  DATE        SESSIONS     TOKENS        CO2      COST
+  DATE        SESSIONS     TOKENS        CO₂      COST
   ──────────  ────────   ────────   ────────  ────────  ────────────────
   Mon Apr  7         2     15.4M     0.93g    $10.05  ████████████████
   Tue Apr  8         1      1.2M     0.02g     $0.12  ▎░░░░░░░░░░░░░░░
@@ -302,7 +302,7 @@ co2de export --month      # Past 30 days
 |---------|-------------|
 | `co2de` | Session summary with weekly sparkline |
 | `co2de usage` | Detailed token usage — Emission Ledger (`--week`, `--month`, `--all`) |
-| `co2de log` | Session history with CO2 bars |
+| `co2de log` | Session history with CO₂ bars |
 | `co2de weekly` | Day-by-day breakdown |
 | `co2de why` | Full calculation pipeline + regional impact |
 | `co2de compare` | AI coding vs hand coding |
@@ -319,14 +319,14 @@ co2de export --month      # Past 30 days
 ## How It Works
 
 ```
-Tokens  -->  Energy (Wh)  -->  CO2 (gCO2e)
+Tokens  -->  Energy (Wh)  -->  CO₂ (gCO₂e)
 ```
 
 1. **Tokens**: Reads from Claude Code session files (`~/.claude/projects/`)
 2. **Energy**: Model-specific coefficients (Opus 0.005, Sonnet 0.0025, Haiku 0.001 Wh/token). Cache reads use 10% energy (90% discount).
-3. **CO2**: Energy × PUE (1.2) × regional grid carbon intensity
+3. **CO₂**: Energy × PUE (1.2) × regional grid carbon intensity
 
-All values are prefixed with `~` because token-based CO2 is an approximation (R²≈0.44 vs actual energy measurement). See [Mamun et al. 2026](https://arxiv.org/abs/2604.02776) for details.
+All values are prefixed with `~` because token-based CO₂ is an approximation (R²≈0.44 vs actual energy measurement). See [Mamun et al. 2026](https://arxiv.org/abs/2604.02776) for details.
 
 ## Scope & Disclaimer
 
@@ -343,7 +343,7 @@ co2de config set budget 50   # Daily budget in grams
 co2de config set budget 1.5kg  # Or in kg
 ```
 
-**Regions**: `global` (475), `us` (390), `eu` (230), `uk` (210), `de` (350), `fr` (55), `se` (25), `no` (10), `kr` (415), `jp` (450), `cn` (555), `in` (630), `au` (510), `ca` (120), `br` (75) — values in gCO2/kWh.
+**Regions**: `global` (475), `us` (390), `eu` (230), `uk` (210), `de` (350), `fr` (55), `se` (25), `no` (10), `kr` (415), `jp` (450), `cn` (555), `in` (630), `au` (510), `ca` (120), `br` (75) — values in gCO₂/kWh.
 
 ## Carbon Badge
 

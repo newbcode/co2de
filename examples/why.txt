@@ -1,5 +1,5 @@
 
-💨 co2de — Why 1.60g CO2?
+💨 co2de — Why 1.60g CO₂?
 
 STEP 1: Token Count
   Input:        12,451 tokens (prompt, context)
@@ -16,8 +16,8 @@ STEP 2: Energy Consumption
   Total: 11965.87 Wh = 11.9659 kWh
 
 STEP 3: Carbon Emission
-  Region: us → 390 gCO2/kWh
-  CO2:    11.9659 × 390 = 1.60g CO2e
+  Region: us → 390 gCO₂/kWh
+  CO₂:    11.9659 × 390 = 1.60g CO₂e
 
 MODEL SUGGESTION
   If Sonnet:  ~0.80g (50% less)
@@ -33,12 +33,12 @@ COMPARISONS
   💡 0.16 hours of an LED bulb
 
 REGIONAL IMPACT — Same tokens, different grids
-  Your region (us)    ████████████▍░░░░░░░   1.60g   390 gCO2/kWh
-  France (nuclear)    █▊░░░░░░░░░░░░░░░░░░   0.23g    55 gCO2/kWh  -86%
-  Norway (hydro)      ▍░░░░░░░░░░░░░░░░░░░   0.04g    10 gCO2/kWh  -97%
-  India (coal-heavy)  ████████████████████   2.59g   630 gCO2/kWh  +62%
+  Your region (us)    ████████████▍░░░░░░░   1.60g   390 gCO₂/kWh
+  France (nuclear)    █▊░░░░░░░░░░░░░░░░░░   0.23g    55 gCO₂/kWh  -86%
+  Norway (hydro)      ▍░░░░░░░░░░░░░░░░░░░   0.04g    10 gCO₂/kWh  -97%
+  India (coal-heavy)  ████████████████████   2.59g   630 gCO₂/kWh  +62%
 
-  Anthropic's US datacenter grid: ~390 gCO2/kWh.
+  Anthropic's US datacenter grid: ~390 gCO₂/kWh.
   Your region setting affects the DISPLAY only — actual emissions
   depend on where the provider runs inference.
 
@@ -46,6 +46,6 @@ Sources: IEA 2023, Luccioni et al. 2023, EPA 2024
 Coefficients are estimates. Run 'co2de config' to adjust.
 
   NOTE
-  Token-based CO2 is an approximation (R²≈0.44 vs actual energy).
+  Token-based CO₂ is an approximation (R²≈0.44 vs actual energy).
   Inference time is a stronger predictor but unavailable via API.
   Source: Mamun et al. 2026, arXiv:2604.02776
