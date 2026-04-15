@@ -34,7 +34,7 @@ co2de init
 
 This patches your Claude Code statusline to show real-time CO₂:
 
-![statusline](examples/screenshot-status-line.png)
+![statusline](examples/statusline.png)
 
 ## Quick Start
 
