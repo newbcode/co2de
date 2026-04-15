@@ -293,7 +293,7 @@ co2de export --month      # Past 30 days
 
 | `co2de export` — Carbon Receipt | `co2de export --detail` — ESG Report |
 |:---:|:---:|
-| ![Carbon Receipt](examples/screenshot-receipt.png) | ![ESG Detail Report](examples/screenshot-detail.png) |
+| ![Carbon Receipt](examples/report-receipt.png) | ![ESG Detail Report](examples/report-detail.png) |
 | [view HTML](examples/report-receipt.html) | [view HTML](examples/report-detail.html) |
 
 ## Commands
