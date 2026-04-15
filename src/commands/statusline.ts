@@ -1,45 +1,23 @@
-import { ClaudeAdapter } from "../adapters/claude.js";
 import { calculateCarbon, calculateCost } from "../engine/carbon-calculator.js";
 import { calculateBurnRate } from "../engine/burn-rate.js";
-import { loadConfig } from "../core/config.js";
 import { fmtCO2 } from "../renderer/format.js";
-import type { TokenUsage } from "../core/types.js";
+import { createContext, getLatestSession, aggregateTokenUsage } from "./shared.js";
 
 /**
  * Output a single formatted line for statusline integration.
  * Designed to be called from Claude Code's statusline-command.sh.
  */
 export async function statuslineCommand(): Promise<void> {
-  const config = loadConfig();
-  const adapter = new ClaudeAdapter(config.region);
-  const now = new Date();
-  const dayAgo = new Date(now);
-  dayAgo.setDate(dayAgo.getDate() - 1);
+  const { config, adapter } = createContext();
 
-  const sessions = await adapter.listSessions(dayAgo, now);
-  if (sessions.length === 0) {
+  const latest = await getLatestSession(adapter);
+  if (!latest) {
     console.log("CO2 --");
     return;
   }
 
-  const latest = sessions[0];
-  const entries = await adapter.getSessionUsage(latest.id);
-
-  if (entries.length === 0) {
-    console.log("CO2 --");
-    return;
-  }
-
-  const aggregated: TokenUsage = {
-    input_tokens: entries.reduce((s, e) => s + e.input_tokens, 0),
-    output_tokens: entries.reduce((s, e) => s + e.output_tokens, 0),
-    cache_read_tokens: entries.reduce((s, e) => s + e.cache_read_tokens, 0),
-    cache_write_tokens: entries.reduce((s, e) => s + e.cache_write_tokens, 0),
-    model: entries[entries.length - 1].model,
-    provider: "claude",
-    timestamp: entries[0].timestamp,
-    session_id: latest.id,
-  };
+  const { entries } = latest;
+  const aggregated = aggregateTokenUsage(entries);
 
   const result = calculateCarbon(aggregated, config.region);
   const cost = calculateCost(aggregated);

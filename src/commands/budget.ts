@@ -1,20 +1,14 @@
-import { loadConfig, updateConfig } from "../core/config.js";
-import { ClaudeAdapter } from "../adapters/claude.js";
+import { updateConfig } from "../core/config.js";
 import { colors } from "../renderer/colors.js";
 import { fmtCO2, precisionBar, sectionHeader, coloredCO2 } from "../renderer/format.js";
+import { createContext, todayStart, parseGrams } from "./shared.js";
 
 export async function budgetCommand(options: {
   set?: string;
 }): Promise<void> {
   if (options.set) {
-    let grams: number;
-    const raw = options.set.trim().toLowerCase();
-    if (raw.endsWith("kg")) {
-      grams = parseFloat(raw.replace(/kg$/, "")) * 1000;
-    } else {
-      grams = parseFloat(raw.replace(/g$/, ""));
-    }
-    if (isNaN(grams) || grams <= 0) {
+    const grams = parseGrams(options.set);
+    if (grams === null || grams <= 0) {
       console.log(colors.red("  Invalid budget. Use: co2de budget --set 50 or --set 1.5kg"));
       return;
     }
@@ -23,11 +17,9 @@ export async function budgetCommand(options: {
     return;
   }
 
-  const config = loadConfig();
-  const adapter = new ClaudeAdapter(config.region);
+  const { config, adapter } = createContext();
   const now = new Date();
-  const todayStart = new Date(now.toISOString().slice(0, 10));
-  const sessions = await adapter.listSessions(todayStart, now);
+  const sessions = await adapter.listSessions(todayStart(), now);
   const budget = config.daily_budget_grams;
   const totalUsed = sessions.reduce((s, ses) => s + ses.co2_grams, 0);
 

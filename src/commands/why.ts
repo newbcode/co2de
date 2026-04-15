@@ -1,39 +1,25 @@
-import { ClaudeAdapter } from "../adapters/claude.js";
 import {
   getEnergyPerToken,
   calculateMetaphors,
 } from "../engine/carbon-calculator.js";
 import { PUE, CACHE_READ_ENERGY_FACTOR, CARBON_INTENSITY_GCO2_PER_KWH } from "../core/constants.js";
-import { loadConfig } from "../core/config.js";
 import { getEmissionLevel } from "../core/tone.js";
 import { colors, colorForLevel } from "../renderer/colors.js";
 import { renderMetaphors } from "../renderer/display.js";
 import { fmtCO2, precisionBar } from "../renderer/format.js";
-import type { TokenUsage } from "../core/types.js";
+import { createContext, getLatestSession } from "./shared.js";
 
 export async function whyCommand(): Promise<void> {
-  const config = loadConfig();
-  const adapter = new ClaudeAdapter(config.region);
+  const { config, adapter } = createContext();
   const region = config.region;
 
-  // Get most recent session
-  const now = new Date();
-  const dayAgo = new Date(now);
-  dayAgo.setDate(dayAgo.getDate() - 1);
-
-  const sessions = await adapter.listSessions(dayAgo, now);
-  if (sessions.length === 0) {
+  const result = await getLatestSession(adapter);
+  if (!result) {
     console.log(colors.dim("  No recent sessions found."));
     return;
   }
 
-  const latest = sessions[0];
-  const entries = await adapter.getSessionUsage(latest.id);
-
-  if (entries.length === 0) {
-    console.log(colors.dim("  No token data for this session."));
-    return;
-  }
+  const { entries } = result;
 
   // Aggregate — track per-model token counts to use the dominant model
   let totalInput = 0;

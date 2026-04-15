@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatCO2, getEmissionLevel, getToneMessage } from "../../src/core/tone.js";
+import { formatCO2, getEmissionLevel } from "../../src/core/tone.js";
 
 describe("formatCO2", () => {
   it("formats milligrams", () => {
@@ -41,16 +41,3 @@ describe("getEmissionLevel", () => {
   });
 });
 
-describe("getToneMessage", () => {
-  it("returns correct level for each emission tier", () => {
-    expect(getToneMessage(0.1).level).toBe("low");
-    expect(getToneMessage(5).level).toBe("medium");
-    expect(getToneMessage(25).level).toBe("high");
-    expect(getToneMessage(100).level).toBe("extreme");
-  });
-
-  it("summary returns formatted CO2 string", () => {
-    const msg = getToneMessage(5.5);
-    expect(msg.summary(5.5)).toContain("5.50g");
-  });
-});

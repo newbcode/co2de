@@ -5,6 +5,7 @@
  */
 import { colors, BAR, colorForLevel } from "./colors.js";
 import { formatCO2, getEmissionLevel } from "../core/tone.js";
+import { resolveModelFamily } from "../engine/carbon-calculator.js";
 import type { DetailedSession } from "../adapters/claude.js";
 
 // ─── Token / Number Formatting ───────────────────────────
@@ -52,22 +53,23 @@ export function fmtDateFull(iso: string): string {
 
 // ─── Model Display ───────────────────────────────────────
 
-export function shortModel(model: string): string {
-  if (model.includes("opus")) return "opus";
-  if (model.includes("sonnet")) return "sonnet";
-  if (model.includes("haiku")) return "haiku";
-  if (model.startsWith("<") || model === "unknown") return "";
-  return model.slice(0, 6);
-}
+const MODEL_SHORT_NAMES: Record<string, string> = {
+  "claude-opus": "opus",
+  "claude-sonnet": "sonnet",
+  "claude-haiku": "haiku",
+  "gemini-pro": "gem-pro",
+  "gemini-flash": "gem-fla",
+};
 
-export function modelColor(_model: string): (s: string) => string {
-  return colors.dim;
+export function shortModel(model: string): string {
+  if (model.startsWith("<") || model === "unknown") return "";
+  return MODEL_SHORT_NAMES[resolveModelFamily(model)] ?? model.slice(0, 6);
 }
 
 export function modelTag(model: string): string {
   const name = shortModel(model);
   if (!name) return "";
-  return modelColor(model)(name);
+  return colors.dim(name);
 }
 
 // ─── ANSI Utilities ──────────────────────────────────────

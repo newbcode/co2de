@@ -1,15 +1,11 @@
-import { ClaudeAdapter } from "../adapters/claude.js";
-import { loadConfig } from "../core/config.js";
 import { renderHeatmap } from "../renderer/charts.js";
+import { createContext, daysAgo } from "./shared.js";
 
 export async function heatmapCommand(): Promise<void> {
-  const config = loadConfig();
-  const adapter = new ClaudeAdapter(config.region);
+  const { adapter } = createContext();
   const now = new Date();
-  const monthAgo = new Date(now);
-  monthAgo.setDate(monthAgo.getDate() - 30);
 
-  const sessions = await adapter.listSessions(monthAgo, now);
+  const sessions = await adapter.listSessions(daysAgo(30), now);
 
   // Aggregate by day
   const dayMap = new Map<string, number>();

@@ -1,5 +1,4 @@
 import { collectAllSessions, type DetailedSession } from "../adapters/claude.js";
-import { loadConfig } from "../core/config.js";
 import { colors, colorForLevel } from "../renderer/colors.js";
 import { getEmissionLevel } from "../core/tone.js";
 import {
@@ -7,6 +6,7 @@ import {
   shortModel, modelTag, boxRow,
   precisionBar, weightedCacheHit, coloredCO2,
 } from "../renderer/format.js";
+import { createContext, daysAgo } from "./shared.js";
 
 /** Format model list to fit in 7-char column with ANSI padding */
 function fmtModels(models: string[]): string {
@@ -239,16 +239,14 @@ export async function usageCommand(opts: { all?: boolean; week?: boolean; month?
     to = undefined;
     periodLabel = "All Time";
   } else if (opts.month) {
-    from = new Date(now);
-    from.setDate(from.getDate() - 30);
+    from = daysAgo(30);
     periodLabel = `${fmtDateFull(from.toISOString())} → ${fmtDateFull(now.toISOString())}`;
   } else {
-    from = new Date(now);
-    from.setDate(from.getDate() - 7);
+    from = daysAgo(7);
     periodLabel = `${fmtDateFull(from.toISOString())} → ${fmtDateFull(now.toISOString())}`;
   }
 
-  const config = loadConfig();
+  const { config } = createContext();
   const sessions = collectAllSessions(from, to, config.region);
 
   if (sessions.length === 0) {

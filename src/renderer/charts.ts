@@ -70,19 +70,20 @@ export function renderComparisonBars(
 
 const BLOCKS = [" ", "\u2581", "\u2582", "\u2583", "\u2584", "\u2585", "\u2586", "\u2587", "\u2588"];
 
-export function renderSparkline(values: number[]): string {
+export function renderSparkline(values: number[], spaced = false): string {
   if (values.length === 0) return "";
   const max = Math.max(...values, 0.001);
+  const separator = spaced ? " " : "";
 
   return values
     .map((v) => {
-      if (v <= 0) return "\u00B7";
+      if (v <= 0) return spaced ? colors.dim("\u00B7") : "\u00B7";
       const idx = Math.min(Math.round((v / max) * 8), 8);
       const char = BLOCKS[idx];
       const level = getEmissionLevel(v);
       return colorForLevel(level)(char);
     })
-    .join("");
+    .join(separator);
 }
 
 // ─── Dashboard ────────────────────────────────────────────

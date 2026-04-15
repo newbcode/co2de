@@ -1,12 +1,11 @@
 import { execSync } from "node:child_process";
-import { ClaudeAdapter } from "../adapters/claude.js";
 import { generateHTMLReport } from "../export/html-report.js";
 import { calculateSavings } from "../engine/savings-tracker.js";
 import { calculateMetaphors, getEnergyPerToken } from "../engine/carbon-calculator.js";
-import { loadConfig } from "../core/config.js";
 import { colors } from "../renderer/colors.js";
 import { PUE } from "../core/constants.js";
-import type { TokenUsage, ReportData } from "../core/types.js";
+import type { ReportData } from "../core/types.js";
+import { createContext, daysAgo, todayStart, collectAllEntries } from "./shared.js";
 
 export async function exportCommand(options: {
   today?: boolean;
@@ -14,22 +13,19 @@ export async function exportCommand(options: {
   month?: boolean;
   detail?: boolean;
 }): Promise<void> {
-  const config = loadConfig();
-  const adapter = new ClaudeAdapter(config.region);
+  const { config, adapter } = createContext();
   const now = new Date();
   let from: Date;
   let period: string;
 
   if (options.month) {
-    from = new Date(now);
-    from.setDate(from.getDate() - 30);
+    from = daysAgo(30);
     period = "Past 30 Days";
   } else if (options.today) {
-    from = new Date(now.toISOString().slice(0, 10));
+    from = todayStart();
     period = "Today";
   } else {
-    from = new Date(now);
-    from.setDate(from.getDate() - 7);
+    from = daysAgo(7);
     period = "Past 7 Days";
   }
 
@@ -40,12 +36,7 @@ export async function exportCommand(options: {
     return;
   }
 
-  // Gather all token entries for savings & analysis
-  const allEntries: TokenUsage[] = [];
-  for (const s of sessions) {
-    const entries = await adapter.getSessionUsage(s.id);
-    allEntries.push(...entries);
-  }
+  const allEntries = await collectAllEntries(adapter, sessions);
 
   // Compute aggregates
   let totalCO2 = 0;

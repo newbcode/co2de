@@ -1,30 +1,22 @@
-import { ClaudeAdapter, countLinesWritten } from "../adapters/claude.js";
+import { countLinesWritten } from "../adapters/claude.js";
 import {
   estimateHandCoding,
   estimateLinesFromTokens,
 } from "../engine/handcode-estimator.js";
-import { loadConfig } from "../core/config.js";
 import { colors } from "../renderer/colors.js";
 import { renderComparison } from "../renderer/display.js";
+import { createContext, getLatestSession } from "./shared.js";
 
 export async function compareCommand(): Promise<void> {
-  const config = loadConfig();
-  const adapter = new ClaudeAdapter(config.region);
+  const { config, adapter } = createContext();
 
-  const now = new Date();
-  const dayAgo = new Date(now);
-  dayAgo.setDate(dayAgo.getDate() - 1);
-
-  const sessions = await adapter.listSessions(dayAgo, now);
-  if (sessions.length === 0) {
+  const result = await getLatestSession(adapter);
+  if (!result) {
     console.log(colors.dim("  No recent sessions found."));
     return;
   }
 
-  const latest = sessions[0];
-
-  // Load entries once and reuse for both line counting and duration
-  const entries = await adapter.getSessionUsage(latest.id);
+  const { session: latest, entries } = result;
 
   // Find the actual JSONL file for line counting
   const sessionFilePath = adapter.findSessionFile(latest.id);

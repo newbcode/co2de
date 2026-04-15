@@ -1,21 +1,17 @@
-import { ClaudeAdapter } from "../adapters/claude.js";
-import { loadConfig } from "../core/config.js";
-import { colors } from "../renderer/colors.js";
+import { colors, colorForLevel } from "../renderer/colors.js";
 import { getEmissionLevel } from "../core/tone.js";
-import { colorForLevel } from "../renderer/colors.js";
 import {
   fmtTokens, fmtCO2, fmtCost, fmtDate,
   precisionBar, coloredCO2,
 } from "../renderer/format.js";
+import { createContext, daysAgo } from "./shared.js";
 
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export async function weeklyCommand(): Promise<void> {
-  const config = loadConfig();
-  const adapter = new ClaudeAdapter(config.region);
+  const { adapter } = createContext();
   const now = new Date();
-  const weekAgo = new Date(now);
-  weekAgo.setDate(weekAgo.getDate() - 7);
+  const weekAgo = daysAgo(7);
 
   const sessions = await adapter.listSessions(weekAgo, now);
 

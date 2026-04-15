@@ -1,11 +1,9 @@
-import { ClaudeAdapter } from "../adapters/claude.js";
 import {
   analyzeModelUsage,
   analyzeContextGrowth,
   analyzeCacheUtilization,
   analyzeToolUsage,
 } from "../engine/analyzers.js";
-import { loadConfig } from "../core/config.js";
 import { colors } from "../renderer/colors.js";
 import {
   fmtCO2,
@@ -15,6 +13,7 @@ import {
   sectionHeader,
 } from "../renderer/format.js";
 import type { AuditFinding } from "../core/types.js";
+import { createContext, daysAgo } from "./shared.js";
 
 // ─── Severity Helpers ───────────────────────────────────
 
@@ -43,11 +42,9 @@ const COL_POTENTIAL = 10;
 export async function auditCommand(options: {
   week?: boolean;
 }): Promise<void> {
-  const config = loadConfig();
-  const adapter = new ClaudeAdapter(config.region);
+  const { config, adapter } = createContext();
   const now = new Date();
-  const from = new Date(now);
-  from.setDate(from.getDate() - (options.week ? 7 : 1));
+  const from = daysAgo(options.week ? 7 : 1);
 
   const sessions = await adapter.listSessions(from, now);
   if (sessions.length === 0) {

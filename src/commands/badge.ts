@@ -1,9 +1,8 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join, basename } from "node:path";
-import { ClaudeAdapter } from "../adapters/claude.js";
-import { loadConfig } from "../core/config.js";
 import { colors } from "../renderer/colors.js";
 import { fmtCO2 } from "../renderer/format.js";
+import { createContext } from "./shared.js";
 
 const BADGE_MARKER_START = "<!-- co2de-badge:start -->";
 const BADGE_MARKER_END = "<!-- co2de-badge:end -->";
@@ -54,8 +53,7 @@ function injectBadge(readmePath: string, co2Grams: number): boolean {
 }
 
 export async function badgeCommand(options: { inject?: boolean }): Promise<void> {
-  const config = loadConfig();
-  const adapter = new ClaudeAdapter(config.region);
+  const { adapter } = createContext();
   const projectPath = process.cwd();
   const projectName = basename(projectPath);
 

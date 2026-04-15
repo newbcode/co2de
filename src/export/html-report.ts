@@ -1,18 +1,14 @@
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { ReportData } from "../core/types.js";
-import { fmtCO2 } from "../renderer/format.js";
-import { getEnergyPerToken } from "../engine/carbon-calculator.js";
+import { fmtCO2, fmtTokens } from "../renderer/format.js";
+import { getEnergyPerToken, resolveModelFamily } from "../engine/carbon-calculator.js";
 import { CARBON_INTENSITY_GCO2_PER_KWH, ENERGY_PER_TOKEN_WH, PUE } from "../core/constants.js";
 
 // ─── Helpers ──────────────────────────────────────────────
 
-function formatTokens(n: number): string {
-  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)}B`;
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
-  return n.toLocaleString();
-}
+/** Alias for backward compatibility within this file */
+const formatTokens = fmtTokens;
 
 function formatDistance(meters: number): string {
   if (meters < 1) return `${(meters * 100).toFixed(1)} cm`;
@@ -20,14 +16,16 @@ function formatDistance(meters: number): string {
   return `${(meters / 1000).toFixed(1)} km`;
 }
 
+const MODEL_DISPLAY_NAMES: Record<string, string> = {
+  "claude-opus": "Opus",
+  "claude-sonnet": "Sonnet",
+  "claude-haiku": "Haiku",
+  "gemini-pro": "Gemini Pro",
+  "gemini-flash": "Gemini Flash",
+};
+
 function shortModel(model: string): string {
-  const m = model.toLowerCase();
-  if (m.includes("opus")) return "Opus";
-  if (m.includes("sonnet")) return "Sonnet";
-  if (m.includes("haiku")) return "Haiku";
-  if (m.includes("gemini") && m.includes("pro")) return "Gemini Pro";
-  if (m.includes("gemini") && m.includes("flash")) return "Gemini Flash";
-  return model.length > 15 ? model.slice(0, 15) : model;
+  return MODEL_DISPLAY_NAMES[resolveModelFamily(model)] ?? (model.length > 15 ? model.slice(0, 15) : model);
 }
 
 const MODEL_COLORS = ["#bf5af2", "#64d2ff", "#ffb366", "#ff6b6b", "#8B5CF6", "#F59E0B", "#3B82F6"];

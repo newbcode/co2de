@@ -1,28 +1,19 @@
-import { ClaudeAdapter } from "../adapters/claude.js";
 import { calculateSavings } from "../engine/savings-tracker.js";
-import { loadConfig } from "../core/config.js";
 import { colors } from "../renderer/colors.js";
 import { fmtCO2, precisionBar, sectionHeader, coloredCO2 } from "../renderer/format.js";
+import { createContext, daysAgo, collectAllEntries } from "./shared.js";
 
 export async function savingsCommand(): Promise<void> {
-  const config = loadConfig();
-  const adapter = new ClaudeAdapter(config.region);
+  const { config, adapter } = createContext();
   const now = new Date();
-  const weekAgo = new Date(now);
-  weekAgo.setDate(weekAgo.getDate() - 7);
 
-  const sessions = await adapter.listSessions(weekAgo, now);
+  const sessions = await adapter.listSessions(daysAgo(7), now);
   if (sessions.length === 0) {
     console.log(colors.dim("  No sessions this week."));
     return;
   }
 
-  // Gather all token entries
-  const allEntries = [];
-  for (const s of sessions) {
-    const entries = await adapter.getSessionUsage(s.id);
-    allEntries.push(...entries);
-  }
+  const allEntries = await collectAllEntries(adapter, sessions);
 
   const report = calculateSavings(allEntries, config.region);
 

@@ -1,69 +1,45 @@
-import { ClaudeAdapter, countLinesWritten } from "../adapters/claude.js";
+import { countLinesWritten } from "../adapters/claude.js";
 import { calculateCarbon, calculateCost } from "../engine/carbon-calculator.js";
 import { calculateSavings } from "../engine/savings-tracker.js";
-import { loadConfig } from "../core/config.js";
 import { colors, colorForLevel } from "../renderer/colors.js";
 import { getEmissionLevel } from "../core/tone.js";
-import type { TokenUsage } from "../core/types.js";
+import { renderSparkline } from "../renderer/charts.js";
 import {
   fmtTokens, fmtCO2, fmtCost,
   modelTag, coloredCO2,
   precisionBar,
   ansiPadEnd,
 } from "../renderer/format.js";
+import {
+  createContext, getLatestSession, daysAgo,
+  aggregateTokenUsage, totalTokenCount, collectAllEntries,
+} from "./shared.js";
 
 export async function defaultCommand(): Promise<void> {
-  const config = loadConfig();
-  const adapter = new ClaudeAdapter(config.region);
-  const now = new Date();
-  const dayAgo = new Date(now);
-  dayAgo.setDate(dayAgo.getDate() - 1);
+  const { config, adapter } = createContext();
 
-  const sessions = await adapter.listSessions(dayAgo, now);
-  if (sessions.length === 0) {
+  const result = await getLatestSession(adapter);
+  if (!result) {
     console.log("  No recent sessions. Start a Claude CLI session first.");
     return;
   }
 
-  const latest = sessions[0];
-  const entries = await adapter.getSessionUsage(latest.id);
-
-  if (entries.length === 0) {
-    console.log("  No token data for the latest session.");
-    return;
-  }
-
-  // Aggregate session tokens
-  const aggregated: TokenUsage = {
-    input_tokens: entries.reduce((s, e) => s + e.input_tokens, 0),
-    output_tokens: entries.reduce((s, e) => s + e.output_tokens, 0),
-    cache_read_tokens: entries.reduce((s, e) => s + e.cache_read_tokens, 0),
-    cache_write_tokens: entries.reduce((s, e) => s + e.cache_write_tokens, 0),
-    model: entries[entries.length - 1].model,
-    provider: "claude",
-    timestamp: entries[0].timestamp,
-    session_id: latest.id,
-  };
+  const { session: latest, entries } = result;
+  const aggregated = aggregateTokenUsage(entries);
 
   const sessionResult = calculateCarbon(aggregated, config.region);
   const sessionCost = calculateCost(aggregated);
-  const sessionTokens = aggregated.input_tokens + aggregated.output_tokens +
-    aggregated.cache_read_tokens + aggregated.cache_write_tokens;
+  const sessionTokens = totalTokenCount(aggregated);
 
   // Project totals
   const projectSessions = await adapter.getProjectSessions(process.cwd());
 
   // Savings — gather all token entries from recent sessions
   let savingsData: { actual: number; worstCase: number; savedPct: number } | null = null;
-  const weekAgo = new Date(now);
-  weekAgo.setDate(weekAgo.getDate() - 7);
-  const recentSessions = await adapter.listSessions(weekAgo, now);
+  const now = new Date();
+  const recentSessions = await adapter.listSessions(daysAgo(7), now);
   if (recentSessions.length > 0) {
-    const allEntries: TokenUsage[] = [];
-    for (const s of recentSessions) {
-      const se = await adapter.getSessionUsage(s.id);
-      allEntries.push(...se);
-    }
+    const allEntries = await collectAllEntries(adapter, recentSessions);
     if (allEntries.length > 0) {
       const report = calculateSavings(allEntries, config.region);
       const pct = report.worst_case_co2_grams > 0
@@ -127,19 +103,7 @@ export async function defaultCommand(): Promise<void> {
 
   // WEEK sparkline
   console.log(`  ${colors.bold("WEEK")}  ${colors.dim(weekDayLabels.join(" "))}`);
-  // Space out sparkline characters to align with day labels
-  const max = Math.max(...weekData, 0.001);
-  const BLOCKS = [" ", "\u2581", "\u2582", "\u2583", "\u2584", "\u2585", "\u2586", "\u2587", "\u2588"];
-  const spacedSpark = weekData
-    .map((v) => {
-      if (v <= 0) return colors.dim("\u00B7");
-      const idx = Math.min(Math.round((v / max) * 8), 8);
-      const lev = getEmissionLevel(v);
-      return colorForLevel(lev)(BLOCKS[idx]);
-    })
-    .map((c) => c + " ")
-    .join("");
-  console.log(`        ${spacedSpark}`);
+  console.log(`        ${renderSparkline(weekData, true)}`);
 
   // Total this week
   const weekTotal = weekData.reduce((s, v) => s + v, 0);

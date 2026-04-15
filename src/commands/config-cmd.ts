@@ -2,6 +2,7 @@ import { loadConfig, updateConfig } from "../core/config.js";
 import { CARBON_INTENSITY_GCO2_PER_KWH } from "../core/constants.js";
 import { colors } from "../renderer/colors.js";
 import { fmtCO2 } from "../renderer/format.js";
+import { parseGrams } from "./shared.js";
 
 export function configCommand(action?: string, key?: string, value?: string): void {
   // ── Shortcut: co2de config <region> ──
@@ -43,14 +44,8 @@ export function configCommand(action?: string, key?: string, value?: string): vo
       updateConfig({ region: value });
       console.log(`  Region set to ${value} (${CARBON_INTENSITY_GCO2_PER_KWH[value]} gCO2/kWh)`);
     } else if (key === "budget") {
-      let grams: number;
-      const raw = value.trim().toLowerCase();
-      if (raw.endsWith("kg")) {
-        grams = parseFloat(raw.replace(/kg$/, "")) * 1000;
-      } else {
-        grams = parseFloat(raw.replace(/g$/, ""));
-      }
-      if (isNaN(grams)) {
+      const grams = parseGrams(value);
+      if (grams === null) {
         console.log(colors.red("  Invalid budget value."));
         return;
       }

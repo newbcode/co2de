@@ -9,19 +9,24 @@ import {
 } from "../core/constants.js";
 
 /**
+ * Resolve model family key from a model ID string.
+ * Used by energy, cost, and display logic to avoid duplicated matching.
+ */
+export function resolveModelFamily(model: string): string {
+  const m = model.toLowerCase();
+  if (m.includes("opus")) return "claude-opus";
+  if (m.includes("sonnet")) return "claude-sonnet";
+  if (m.includes("haiku")) return "claude-haiku";
+  if (m.includes("gemini") && m.includes("pro")) return "gemini-pro";
+  if (m.includes("gemini") && m.includes("flash")) return "gemini-flash";
+  return "default";
+}
+
+/**
  * Resolve the energy-per-token coefficient for a given model ID.
- * Matches known prefixes (opus, sonnet, haiku, etc.) and falls back to default.
  */
 export function getEnergyPerToken(model: string): number {
-  const m = model.toLowerCase();
-  if (m.includes("opus")) return ENERGY_PER_TOKEN_WH["claude-opus"];
-  if (m.includes("sonnet")) return ENERGY_PER_TOKEN_WH["claude-sonnet"];
-  if (m.includes("haiku")) return ENERGY_PER_TOKEN_WH["claude-haiku"];
-  if (m.includes("gemini") && m.includes("pro"))
-    return ENERGY_PER_TOKEN_WH["gemini-pro"];
-  if (m.includes("gemini") && m.includes("flash"))
-    return ENERGY_PER_TOKEN_WH["gemini-flash"];
-  return ENERGY_PER_TOKEN_WH["default"];
+  return ENERGY_PER_TOKEN_WH[resolveModelFamily(model)];
 }
 
 /**
@@ -114,13 +119,7 @@ export function quickCO2(
  * Resolve cost rates for a given model.
  */
 function getCostRates(model: string): { input: number; output: number; cache_read: number } {
-  const m = model.toLowerCase();
-  if (m.includes("opus")) return COST_PER_1M_TOKENS["claude-opus"];
-  if (m.includes("sonnet")) return COST_PER_1M_TOKENS["claude-sonnet"];
-  if (m.includes("haiku")) return COST_PER_1M_TOKENS["claude-haiku"];
-  if (m.includes("gemini") && m.includes("pro")) return COST_PER_1M_TOKENS["gemini-pro"];
-  if (m.includes("gemini") && m.includes("flash")) return COST_PER_1M_TOKENS["gemini-flash"];
-  return COST_PER_1M_TOKENS["default"];
+  return COST_PER_1M_TOKENS[resolveModelFamily(model)];
 }
 
 /**
