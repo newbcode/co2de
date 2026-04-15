@@ -4,7 +4,7 @@
  */
 import type { CodingComparison, MetaphorSet } from "../core/types.js";
 import { colors } from "./colors.js";
-import { fmtCO2 } from "./format.js";
+import { fmtCO2, approxCO2 } from "./format.js";
 import { renderComparisonBars } from "./charts.js";
 
 // ─── Metaphor Display ─────────────────────────────────────
@@ -81,7 +81,7 @@ export function renderComparison(comp: CodingComparison): string {
     ? `  ${colors.dim(`(~${(comp.ai_co2_grams / comp.lines_of_code).toFixed(2)}g/line)`)}`
     : "";
   lines.push(
-    `    ~${fmtCO2(comp.ai_co2_grams)} CO2${aiGPerLine}`,
+    `    ${approxCO2(comp.ai_co2_grams)} CO\u2082${aiGPerLine}`,
   );
   lines.push(
     `    ${comp.ai_tokens.toLocaleString()} tokens over ${comp.ai_time_minutes.toFixed(0)} min ${colors.dim("(wall clock, includes idle)")}`,
@@ -94,7 +94,7 @@ export function renderComparison(comp: CodingComparison): string {
     ? `  ${colors.dim(`(~${(comp.hand_co2_grams / comp.lines_of_code).toFixed(3)}g/line)`)}`
     : "";
   lines.push(
-    `    ~${fmtCO2(comp.hand_co2_grams)} CO2${handGPerLine}`,
+    `    ${approxCO2(comp.hand_co2_grams)} CO\u2082${handGPerLine}`,
   );
   lines.push(
     `    ~${handHours.toFixed(1)} hours ${colors.dim("(laptop 30W only, typing at 3 lines/min)")}`,
@@ -108,15 +108,15 @@ export function renderComparison(comp: CodingComparison): string {
   // ── Summary ──
   if (comp.multiplier > 1) {
     lines.push(
-      `  AI: ${colors.red("~" + comp.multiplier.toFixed(0) + "x")} more CO2, ${speedup >= 2 ? colors.green("~" + speedup.toFixed(0) + "x") : colors.dim("~" + speedup.toFixed(1) + "x")} faster`,
+      `  AI: ${colors.red("~" + comp.multiplier.toFixed(0) + "x")} more CO\u2082, ${speedup >= 2 ? colors.green("~" + speedup.toFixed(0) + "x") : colors.dim("~" + speedup.toFixed(1) + "x")} faster`,
     );
   }
   lines.push("");
 
   // ── Caveats ──
   lines.push(colors.dim("  Caveats:"));
-  lines.push(colors.dim("  AI CO2 includes all tokens (conversation, file reads, thinking)"));
-  lines.push(colors.dim("  Hand CO2 = laptop only. Real dev includes monitor, IDE, browsing"));
+  lines.push(colors.dim("  AI CO\u2082 includes all tokens (conversation, file reads, thinking)"));
+  lines.push(colors.dim("  Hand CO\u2082 = laptop only. Real dev includes monitor, IDE, browsing"));
   lines.push(colors.dim("  Hand time = raw typing speed. Real dev is 3-10x slower"));
 
   return lines.join("\n");

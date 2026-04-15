@@ -6,7 +6,7 @@ import { PUE, CACHE_READ_ENERGY_FACTOR, CARBON_INTENSITY_GCO2_PER_KWH } from "..
 import { getEmissionLevel } from "../core/tone.js";
 import { colors, colorForLevel } from "../renderer/colors.js";
 import { renderMetaphors } from "../renderer/display.js";
-import { fmtCO2, precisionBar } from "../renderer/format.js";
+import { fmtCO2, approxCO2, precisionBar } from "../renderer/format.js";
 import { createContext, getLatestSession } from "./shared.js";
 
 export async function whyCommand(): Promise<void> {
@@ -56,7 +56,7 @@ export async function whyCommand(): Promise<void> {
   const co2 = energyKwh * carbonIntensity;
   const metaphors = calculateMetaphors(co2);
 
-  console.log(colors.bold(`\n\u{1F4A8} co2de — Why ${fmtCO2(co2)} CO2?\n`));
+  console.log(colors.bold(`\n\u{1F4A8} co2de — Why ${approxCO2(co2)} CO\u2082?\n`));
 
   // Step 1
   console.log(colors.bold("STEP 1: Token Count"));
@@ -84,8 +84,8 @@ export async function whyCommand(): Promise<void> {
 
   // Step 3
   console.log(colors.bold("STEP 3: Carbon Emission"));
-  console.log(`  Region: ${region} \u2192 ${carbonIntensity} gCO2/kWh`);
-  console.log(`  CO2:    ${energyKwh.toFixed(4)} \u00D7 ${carbonIntensity} = ${colors.bold(fmtCO2(co2))} CO2e`);
+  console.log(`  Region: ${region} \u2192 ${carbonIntensity} gCO\u2082/kWh`);
+  console.log(`  CO\u2082:    ${energyKwh.toFixed(4)} \u00D7 ${carbonIntensity} = ${colors.bold(approxCO2(co2))} CO\u2082e`);
   console.log("");
 
   // Model suggestion
@@ -94,8 +94,8 @@ export async function whyCommand(): Promise<void> {
   const haikuWh = getEnergyPerToken("claude-haiku");
   const sonnetCO2 = ((fullPriceTokens * sonnetWh + totalCacheRead * sonnetWh * CACHE_READ_ENERGY_FACTOR) * PUE / 1000) * carbonIntensity;
   const haikuCO2 = ((fullPriceTokens * haikuWh + totalCacheRead * haikuWh * CACHE_READ_ENERGY_FACTOR) * PUE / 1000) * carbonIntensity;
-  console.log(`  If Sonnet:  ~${fmtCO2(sonnetCO2)} (${((1 - sonnetCO2 / co2) * 100).toFixed(0)}% less)`);
-  console.log(`  If Haiku:   ~${fmtCO2(haikuCO2)} (${((1 - haikuCO2 / co2) * 100).toFixed(0)}% less)`);
+  console.log(`  If Sonnet:  ${approxCO2(sonnetCO2)} (${((1 - sonnetCO2 / co2) * 100).toFixed(0)}% less)`);
+  console.log(`  If Haiku:   ${approxCO2(haikuCO2)} (${((1 - haikuCO2 / co2) * 100).toFixed(0)}% less)`);
   console.log(colors.dim("  Was this model necessary for this task?"));
   console.log("");
 
@@ -136,15 +136,15 @@ export async function whyCommand(): Promise<void> {
   console.log(colors.bold("REGIONAL IMPACT") + colors.dim(" — Same tokens, different grids"));
   for (const entry of regionEntries) {
     const bar = precisionBar(entry.co2g, maxRegionCO2, barWidth, colorForLevel(getEmissionLevel(entry.co2g)));
-    const co2Str = fmtCO2(entry.co2g).padStart(7);
-    const intensityStr = `${entry.intensity} gCO2/kWh`;
+    const co2Str = approxCO2(entry.co2g).padStart(8);
+    const intensityStr = `${entry.intensity} gCO\u2082/kWh`;
     const diffStr = entry.diff === null
       ? ""
       : `  ${entry.diff > 0 ? "+" : ""}${entry.diff.toFixed(0)}%`;
     console.log(`  ${entry.label.padEnd(20)}${bar}  ${co2Str}   ${intensityStr}${diffStr}`);
   }
   console.log("");
-  console.log(colors.dim("  Anthropic's US datacenter grid: ~390 gCO2/kWh."));
+  console.log(colors.dim("  Anthropic's US datacenter grid: ~390 gCO\u2082/kWh."));
   console.log(colors.dim("  Your region setting affects the DISPLAY only — actual emissions"));
   console.log(colors.dim("  depend on where the provider runs inference."));
   console.log("");
@@ -156,7 +156,7 @@ export async function whyCommand(): Promise<void> {
 
   // Methodology limitation note
   console.log(colors.dim("  NOTE"));
-  console.log(colors.dim("  Token-based CO2 is an approximation (R\u00B2\u22480.44 vs actual energy)."));
+  console.log(colors.dim("  Token-based CO\u2082 is an approximation (R\u00B2\u22480.44 vs actual energy)."));
   console.log(colors.dim("  Inference time is a stronger predictor but unavailable via API."));
   console.log(colors.dim("  Source: Mamun et al. 2026, arXiv:2604.02776"));
   console.log("");

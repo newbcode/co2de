@@ -2,7 +2,7 @@ import { collectAllSessions, type DetailedSession } from "../adapters/claude.js"
 import { colors, colorForLevel } from "../renderer/colors.js";
 import { getEmissionLevel } from "../core/tone.js";
 import {
-  fmtTokens, fmtCO2, fmtCost, fmtDate, fmtDateFull,
+  fmtTokens, fmtCO2, approxCO2, fmtCost, fmtDate, fmtDateFull,
   shortModel, modelTag, boxRow,
   precisionBar, weightedCacheHit, coloredCO2,
 } from "../renderer/format.js";
@@ -47,7 +47,7 @@ function renderMetricCard(sessions: DetailedSession[]): string[] {
   const cacheBar = precisionBar(avgHit, 100, 12, cacheColor);
 
   lines.push(colors.dim(`╔${dhr}╗`));
-  lines.push(row(`${colors.bold("COST")}  ${colors.dim(fmtCost(totalCost).padStart(10))}     ${colors.bold("CO2")}  ${co2Color(("~" + fmtCO2(totalCO2)).padStart(10))}     ${colors.bold("CACHE")}  ${cacheColor(avgHit.toFixed(0) + "%")}`));
+  lines.push(row(`${colors.bold("COST")}  ${colors.dim(fmtCost(totalCost).padStart(10))}     ${colors.bold("CO\u2082")}  ${co2Color(approxCO2(totalCO2).padStart(10))}     ${colors.bold("CACHE")}  ${cacheColor(avgHit.toFixed(0) + "%")}`));
   lines.push(row(`${sessions.length} ses · ${projects.size} proj · ${fmtTokens(totalTokens)} tok${"".padStart(12)}${cacheBar}`));
   lines.push(colors.dim(`╚${dhr}╝`));
 
@@ -72,7 +72,7 @@ function renderProjectTable(projectAggs: ProjectAgg[]): string[] {
 
   lines.push("");
   lines.push(
-    `  ${colors.dim("PROJECT".padEnd(22))} ${colors.dim("SES".padStart(3))}  ${colors.dim("TOKENS".padStart(8))}  ${colors.dim("COST".padStart(8))}  ${colors.dim("CO2".padStart(8))}  ${colors.dim("HIT".padStart(4))}  ${colors.dim("EMISSION".padEnd(barW))}`,
+    `  ${colors.dim("PROJECT".padEnd(22))} ${colors.dim("SES".padStart(3))}  ${colors.dim("TOKENS".padStart(8))}  ${colors.dim("COST".padStart(8))}  ${colors.dim("CO\u2082".padStart(8))}  ${colors.dim("HIT".padStart(4))}  ${colors.dim("EMISSION".padEnd(barW))}`,
   );
   lines.push(colors.dim(`  ${"─".repeat(22)} ${"─".repeat(3)}  ${"─".repeat(8)}  ${"─".repeat(8)}  ${"─".repeat(8)}  ${"─".repeat(4)}  ${"─".repeat(barW)}`));
 
@@ -119,7 +119,7 @@ function renderSessionDetail(
   lines.push("");
   lines.push(colors.bold("  SESSION DETAIL"));
   lines.push(
-    `  ${colors.dim("#".padStart(3))}  ${colors.dim("DATE".padEnd(6))}  ${colors.dim("MODEL".padEnd(7))}  ${colors.dim("TOKENS".padStart(8))}  ${colors.dim("IN".padStart(7))}  ${colors.dim("OUT".padStart(7))}  ${colors.dim("CW".padStart(7))}  ${colors.dim("CR".padStart(7))}  ${colors.dim("COST".padStart(7))}  ${colors.dim("CO2".padStart(7))}  ${colors.dim("HIT".padStart(4))}  ${colors.dim("".padEnd(barW))}`,
+    `  ${colors.dim("#".padStart(3))}  ${colors.dim("DATE".padEnd(6))}  ${colors.dim("MODEL".padEnd(7))}  ${colors.dim("TOKENS".padStart(8))}  ${colors.dim("IN".padStart(7))}  ${colors.dim("OUT".padStart(7))}  ${colors.dim("CW".padStart(7))}  ${colors.dim("CR".padStart(7))}  ${colors.dim("COST".padStart(7))}  ${colors.dim("CO\u2082".padStart(7))}  ${colors.dim("HIT".padStart(4))}  ${colors.dim("".padEnd(barW))}`,
   );
   lines.push(colors.dim(`  ${"─".repeat(3)}──${"─".repeat(6)}──${"─".repeat(7)}──${"─".repeat(8)}──${"─".repeat(7)}──${"─".repeat(7)}──${"─".repeat(7)}──${"─".repeat(7)}──${"─".repeat(7)}──${"─".repeat(7)}──${"─".repeat(4)}──${"─".repeat(barW)}`));
 
@@ -204,7 +204,7 @@ function renderInsights(sessions: DetailedSession[], projectAggs: ProjectAgg[]):
 
   const topLevel = getEmissionLevel(topEmitter.co2_grams);
   lines.push(
-    `  ${colorForLevel(topLevel)("●")} Heaviest session: ${topEmitter.project} ${colors.dim(fmtDate(topEmitter.last_activity))} — ${colorForLevel(topLevel)(fmtCO2(topEmitter.co2_grams))} CO2`,
+    `  ${colorForLevel(topLevel)("●")} Heaviest session: ${topEmitter.project} ${colors.dim(fmtDate(topEmitter.last_activity))} — ${colorForLevel(topLevel)(approxCO2(topEmitter.co2_grams))} CO\u2082`,
   );
   lines.push(
     `  ${colors.dim("●")} Most expensive: ${mostExpensive.project} ${colors.dim(fmtDate(mostExpensive.last_activity))} — ${fmtCost(mostExpensive.cost_usd)}`,
@@ -218,7 +218,7 @@ function renderInsights(sessions: DetailedSession[], projectAggs: ProjectAgg[]):
   // Avg CO2 per session
   const avgPerSession = totalCO2 / active.length;
   lines.push(
-    `  ${colors.dim("●")} Avg per session: ~${fmtCO2(avgPerSession)}`,
+    `  ${colors.dim("●")} Avg per session: ${approxCO2(avgPerSession)}`,
   );
 
   return lines;
@@ -256,7 +256,7 @@ export async function usageCommand(opts: { all?: boolean; week?: boolean; month?
 
   // ── Header ──
   console.log("");
-  console.log(colors.bold("  CO2 EMISSION LEDGER"));
+  console.log(colors.bold("  CO\u2082 EMISSION LEDGER"));
   console.log(colors.dim(`  ${periodLabel}`));
   console.log("");
 

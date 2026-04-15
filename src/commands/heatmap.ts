@@ -20,6 +20,6 @@ export async function heatmapCommand(): Promise<void> {
   }));
 
   console.log("");
-  console.log(renderHeatmap(data, "\u{1F4A8} CO2 Heatmap — Past 30 Days"));
+  console.log(renderHeatmap(data, "\u{1F4A8} CO\u2082 Heatmap — Past 30 Days"));
   console.log("");
 }

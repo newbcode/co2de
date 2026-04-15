@@ -27,7 +27,7 @@ export function createProgram(): Command {
   program.action(defaultCommand);
 
   program.command("why")
-    .description("Explain WHY this much CO2 was emitted — full calculation breakdown")
+    .description("Explain WHY this much CO\u2082 was emitted — full calculation breakdown")
     .action(whyCommand);
 
   program.command("compare")
@@ -44,7 +44,7 @@ export function createProgram(): Command {
     .action(budgetCommand);
 
   program.command("heatmap")
-    .description("GitHub-style contribution calendar for CO2")
+    .description("GitHub-style contribution calendar for CO\u2082")
     .action(heatmapCommand);
 
   program.command("config [action] [key] [value]")

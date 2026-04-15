@@ -319,7 +319,7 @@ co2de export --month      # Past 30 days
 ## How It Works
 
 ```
-Tokens  →  Energy (Wh)  →  CO2 (gCO2e)
+Tokens  -->  Energy (Wh)  -->  CO2 (gCO2e)
 ```
 
 1. **Tokens**: Reads from Claude Code session files (`~/.claude/projects/`)
@@ -327,6 +327,12 @@ Tokens  →  Energy (Wh)  →  CO2 (gCO2e)
 3. **CO2**: Energy × PUE (1.2) × regional grid carbon intensity
 
 All values are prefixed with `~` because token-based CO2 is an approximation (R²≈0.44 vs actual energy measurement). See [Mamun et al. 2026](https://arxiv.org/abs/2604.02776) for details.
+
+## Scope & Disclaimer
+
+**Scope**: co2de estimates **Scope 2 emissions from inference electricity only**. Training energy, hardware manufacturing, network transmission, and other lifecycle emissions are excluded. See [METHODOLOGY.md](METHODOLOGY.md) for full details.
+
+**Disclaimer**: co2de is an **awareness tool, not a compliance tool**. Its outputs are order-of-magnitude estimates with significant uncertainty (energy coefficients are not measured values; token count explains ~44% of energy variance). Do not use co2de outputs for GHG Protocol reporting, carbon accounting, ESG audits, or regulatory filings without independent verification.
 
 ## Configuration
 
@@ -360,7 +366,7 @@ Re-run `co2de badge --inject` after sessions to update the value.
 | [EPA 2024](https://www.epa.gov/energy/greenhouse-gas-equivalencies-calculator) | Equivalency factors |
 | [Uptime Institute 2023](https://uptimeinstitute.com/resources/research-and-reports/uptime-institute-global-data-center-survey-results-2023) | PUE benchmarks |
 
-These are **conservative upper-bound estimates**. Actual emissions are likely lower. Run `co2de why` for the full methodology.
+These are **conservative upper-bound estimates**. Actual emissions are likely lower. See [METHODOLOGY.md](METHODOLOGY.md) for how coefficients were derived and what limitations apply.
 
 ## Architecture
 

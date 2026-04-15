@@ -1,7 +1,7 @@
 import { colors, colorForLevel } from "../renderer/colors.js";
 import { getEmissionLevel } from "../core/tone.js";
 import {
-  fmtTokens, fmtCO2, fmtCost,
+  fmtTokens, approxCO2, fmtCost,
   modelTag, coloredCO2, fmtTimeAgo,
   precisionBar, ansiPadEnd,
 } from "../renderer/format.js";
@@ -31,7 +31,7 @@ export async function logCommand(): Promise<void> {
   const hdrModel = "MODEL".padEnd(7);
   const hdrTok = "TOKENS".padStart(8);
   const hdrCost = "COST".padStart(8);
-  const hdrCO2 = "CO2".padStart(8);
+  const hdrCO2 = "CO\u2082".padStart(8);
   console.log(
     `  ${colors.dim(hdrNum)}  ${colors.dim(hdrTime)}  ${colors.dim(hdrModel)}  ${colors.dim(hdrTok)}  ${colors.dim(hdrCost)}  ${colors.dim(hdrCO2)}  ${colors.dim("".padEnd(barW))}`,
   );
@@ -48,7 +48,7 @@ export async function logCommand(): Promise<void> {
     const tokens = fmtTokens(s.total_tokens).padStart(8);
     const cost = colors.dim(fmtCost(s.cost_usd).padStart(8));
     const co2 = coloredCO2(s.co2_grams);
-    const co2Raw = fmtCO2(s.co2_grams);
+    const co2Raw = approxCO2(s.co2_grams);
     const co2Padded = " ".repeat(Math.max(0, 8 - co2Raw.length)) + co2;
 
     const level = getEmissionLevel(s.co2_grams);

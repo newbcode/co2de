@@ -1,7 +1,7 @@
 import { colors, colorForLevel } from "../renderer/colors.js";
 import { getEmissionLevel } from "../core/tone.js";
 import {
-  fmtTokens, fmtCO2, fmtCost, fmtDate,
+  fmtTokens, fmtCO2, approxCO2, fmtCost, fmtDate,
   precisionBar, coloredCO2,
 } from "../renderer/format.js";
 import { createContext, daysAgo } from "./shared.js";
@@ -58,7 +58,7 @@ export async function weeklyCommand(): Promise<void> {
   const hdrDate = "DATE".padEnd(10);
   const hdrSes = "SESSIONS".padStart(8);
   const hdrTok = "TOKENS".padStart(8);
-  const hdrCO2 = "CO2".padStart(8);
+  const hdrCO2 = "CO\u2082".padStart(8);
   const hdrCost = "COST".padStart(8);
   console.log(
     `  ${colors.dim(hdrDate)}  ${colors.dim(hdrSes)}   ${colors.dim(hdrTok)}   ${colors.dim(hdrCO2)}  ${colors.dim(hdrCost)}`,
@@ -92,7 +92,7 @@ export async function weeklyCommand(): Promise<void> {
       const bar = precisionBar(data.co2, maxCO2, barW, co2Color);
 
       console.log(
-        `  ${dateLabel.padEnd(10)}  ${String(data.sessions).padStart(8)}   ${fmtTokens(data.tokens).padStart(8)}   ${coloredCO2(data.co2).padStart(8 + (coloredCO2(data.co2).length - fmtCO2(data.co2).length))}  ${colors.yellow(fmtCost(data.cost).padStart(8))}  ${bar}`,
+        `  ${dateLabel.padEnd(10)}  ${String(data.sessions).padStart(8)}   ${fmtTokens(data.tokens).padStart(8)}   ${coloredCO2(data.co2).padStart(9 + (coloredCO2(data.co2).length - approxCO2(data.co2).length))}  ${colors.yellow(fmtCost(data.cost).padStart(8))}  ${bar}`,
       );
     }
   }
@@ -103,8 +103,8 @@ export async function weeklyCommand(): Promise<void> {
   // Total row
   const totalLevel = getEmissionLevel(totalCO2);
   const totalCo2Color = colorForLevel(totalLevel);
-  const co2Str = totalCo2Color(fmtCO2(totalCO2));
-  const co2Raw = fmtCO2(totalCO2);
+  const co2Str = totalCo2Color(approxCO2(totalCO2));
+  const co2Raw = approxCO2(totalCO2);
   console.log(
     `  ${colors.bold("TOTAL".padEnd(10))}  ${colors.bold(String(totalSessions).padStart(8))}   ${colors.bold(fmtTokens(totalTokens).padStart(8))}   ${colors.bold(co2Str)}${" ".repeat(Math.max(0, 8 - co2Raw.length))}  ${colors.bold(colors.yellow(fmtCost(totalCost).padStart(8)))}`,
   );
@@ -113,7 +113,7 @@ export async function weeklyCommand(): Promise<void> {
   const avgCO2 = activeDays > 0 ? totalCO2 / activeDays : 0;
   console.log("");
   console.log(
-    `  ${colors.dim("Avg:")} ${fmtCO2(avgCO2)}/day ${colors.dim("\u00B7")} ${colors.dim("Peak:")} ${peakDay} (${fmtCO2(peakCO2)})`,
+    `  ${colors.dim("Avg:")} ${approxCO2(avgCO2)}/day ${colors.dim("\u00B7")} ${colors.dim("Peak:")} ${peakDay} (${approxCO2(peakCO2)})`,
   );
   console.log("");
 }

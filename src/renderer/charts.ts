@@ -4,7 +4,7 @@
  */
 import { colors, BAR, colorForLevel } from "./colors.js";
 import { getEmissionLevel } from "../core/tone.js";
-import { fmtCO2 } from "./format.js";
+import { fmtCO2, approxCO2 } from "./format.js";
 
 // ─── Bar Chart ────────────────────────────────────────────
 
@@ -229,12 +229,12 @@ export function renderHeatmap(
   const avgCO2 = data.length > 0 ? totalCO2 / data.length : 0;
   lines.push("");
   lines.push(
-    `  Total: ~${fmtCO2(totalCO2)} | avg ~${fmtCO2(avgCO2)}/day`,
+    `  Total: ${approxCO2(totalCO2)} | avg ${approxCO2(avgCO2)}/day`,
   );
 
   if (heaviestDay) {
     lines.push(
-      colors.dim(`  Heaviest: ${heaviestDay} (~${fmtCO2(heaviestValue)})`),
+      colors.dim(`  Heaviest: ${heaviestDay} (${approxCO2(heaviestValue)})`),
     );
   }
 

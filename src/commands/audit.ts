@@ -6,7 +6,7 @@ import {
 } from "../engine/analyzers.js";
 import { colors } from "../renderer/colors.js";
 import {
-  fmtCO2,
+  approxCO2,
   coloredCO2,
   precisionBar,
   ansiPadEnd,
@@ -132,7 +132,7 @@ export async function auditCommand(options: {
   for (const f of findings) {
     const dots = ansiPadEnd(sevDots(f.severity), COL_SEV);
     const pattern = ansiPadEnd(colors.bold(f.pattern), COL_PATTERN);
-    const savingsStr = sevColor(f.severity)(`-${fmtCO2(f.potential_savings_grams)}`);
+    const savingsStr = sevColor(f.severity)(`-${approxCO2(f.potential_savings_grams)}`);
     const potential = ansiPadEnd(savingsStr, COL_POTENTIAL);
     console.log(`  ${dots}${pattern}${potential}${f.description}`);
   }

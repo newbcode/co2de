@@ -151,12 +151,16 @@ export function sectionHeader(title: string, stats?: string): string {
 
 // ─── CO2 Colored Value ───────────────────────────────────
 
-/** Format CO2 value with emission-level coloring. kg values are bold. */
+/** Format CO2 estimate with ~ prefix and emission-level coloring. kg values are bold. */
 export function coloredCO2(grams: number): string {
   const level = getEmissionLevel(grams);
   const color = colorForLevel(level);
-  const text = fmtCO2(grams);
-  // kg = serious amount → bold for emphasis
+  const text = "~" + fmtCO2(grams);
   if (grams >= 1000) return colors.bold(color(text));
   return color(text);
+}
+
+/** Format CO2 estimate with ~ prefix (uncolored). Use fmtCO2() for exact values like budgets. */
+export function approxCO2(grams: number): string {
+  return "~" + fmtCO2(grams);
 }

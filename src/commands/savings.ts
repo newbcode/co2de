@@ -1,6 +1,6 @@
 import { calculateSavings } from "../engine/savings-tracker.js";
 import { colors } from "../renderer/colors.js";
-import { fmtCO2, precisionBar, sectionHeader, coloredCO2 } from "../renderer/format.js";
+import { fmtCO2, approxCO2, precisionBar, sectionHeader, coloredCO2 } from "../renderer/format.js";
 import { createContext, daysAgo, collectAllEntries } from "./shared.js";
 
 export async function savingsCommand(): Promise<void> {
@@ -31,13 +31,13 @@ export async function savingsCommand(): Promise<void> {
   console.log(
     `  ACTUAL    ${precisionBar(actual, worst, barWidth, colors.yellow)}  ${coloredCO2(actual)}`,
   );
-  // WORST bar
+  // WORST bar (hypothetical ceiling)
   console.log(
-    `  WORST     ${precisionBar(worst, worst, barWidth, colors.red)}  ${fmtCO2(worst)} ${colors.dim("(all-opus, no cache)")}`,
+    `  WORST*    ${precisionBar(worst, worst, barWidth, colors.red)}  ${approxCO2(worst)} ${colors.dim("(hypothetical: all-opus, no cache)")}`,
   );
   // SAVED bar
   console.log(
-    `  SAVED     ${precisionBar(saved, worst, barWidth, colors.green)}  ${colors.green(fmtCO2(saved))} ${colors.green(`(${pct}%)`)}`,
+    `  SAVED     ${precisionBar(saved, worst, barWidth, colors.green)}  ${colors.green(approxCO2(saved))} ${colors.green(`(${pct}%)`)}`,
   );
 
   // Breakdown section
@@ -52,7 +52,7 @@ export async function savingsCommand(): Promise<void> {
     for (const item of report.savings_breakdown) {
       const label = item.category.padEnd(labelWidth);
       const bar = precisionBar(item.saved_grams, maxSaved, breakdownBarWidth, colors.green);
-      const value = fmtCO2(item.saved_grams);
+      const value = approxCO2(item.saved_grams);
       console.log(`  ${label}${bar}  ${colors.green(value)} saved`);
     }
   } else {
@@ -80,8 +80,9 @@ export async function savingsCommand(): Promise<void> {
 
   // Explanation
   console.log("");
-  console.log(colors.dim("  ACTUAL = cache reads at 10% energy + real model"));
-  console.log(colors.dim("  WORST  = all Opus + no cache (every token full price)"));
-  console.log(colors.dim("  SAVED  = WORST − ACTUAL"));
+  console.log(colors.dim("  ACTUAL  = cache reads at 10% energy + real model"));
+  console.log(colors.dim("  WORST*  = hypothetical ceiling: all Opus + no cache (every token full price)"));
+  console.log(colors.dim("  SAVED   = WORST* − ACTUAL"));
+  console.log(colors.dim("  * Worst-case is deliberately extreme. Most users would never hit this ceiling."));
   console.log("");
 }

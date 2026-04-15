@@ -8,7 +8,7 @@ export function configCommand(action?: string, key?: string, value?: string): vo
   // ── Shortcut: co2de config <region> ──
   if (action && action !== "show" && action !== "set" && action in CARBON_INTENSITY_GCO2_PER_KWH) {
     updateConfig({ region: action });
-    console.log(`  Region set to ${action} (${CARBON_INTENSITY_GCO2_PER_KWH[action]} gCO2/kWh)`);
+    console.log(`  Region set to ${action} (${CARBON_INTENSITY_GCO2_PER_KWH[action]} gCO\u2082/kWh)`);
     return;
   }
 
@@ -20,7 +20,7 @@ export function configCommand(action?: string, key?: string, value?: string): vo
       : colors.dim("not set");
 
     console.log(colors.bold("\n  co2de Configuration\n"));
-    console.log(`  region:         ${config.region} (${CARBON_INTENSITY_GCO2_PER_KWH[config.region] ?? "?"} gCO2/kWh)`);
+    console.log(`  region:         ${config.region} (${CARBON_INTENSITY_GCO2_PER_KWH[config.region] ?? "?"} gCO\u2082/kWh)`);
     console.log(`  daily_budget:   ${budgetStr}`);
     console.log("");
     console.log(colors.dim("  Available regions: " + Object.keys(CARBON_INTENSITY_GCO2_PER_KWH).join(", ")));
@@ -42,7 +42,7 @@ export function configCommand(action?: string, key?: string, value?: string): vo
         return;
       }
       updateConfig({ region: value });
-      console.log(`  Region set to ${value} (${CARBON_INTENSITY_GCO2_PER_KWH[value]} gCO2/kWh)`);
+      console.log(`  Region set to ${value} (${CARBON_INTENSITY_GCO2_PER_KWH[value]} gCO\u2082/kWh)`);
     } else if (key === "budget") {
       const grams = parseGrams(value);
       if (grams === null) {

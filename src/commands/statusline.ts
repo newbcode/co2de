@@ -1,6 +1,6 @@
 import { calculateCarbon, calculateCost } from "../engine/carbon-calculator.js";
 import { calculateBurnRate } from "../engine/burn-rate.js";
-import { fmtCO2 } from "../renderer/format.js";
+import { fmtCO2, approxCO2 } from "../renderer/format.js";
 import { createContext, getLatestSession, aggregateTokenUsage } from "./shared.js";
 
 /**
@@ -12,7 +12,7 @@ export async function statuslineCommand(): Promise<void> {
 
   const latest = await getLatestSession(adapter);
   if (!latest) {
-    console.log("CO2 --");
+    console.log("CO\u2082 --");
     return;
   }
 
@@ -23,10 +23,10 @@ export async function statuslineCommand(): Promise<void> {
   const cost = calculateCost(aggregated);
   const burnRate = calculateBurnRate(entries, config.region);
 
-  let output = `CO2 ${fmtCO2(result.co2_grams)} | $${cost.toFixed(2)}`;
+  let output = `CO\u2082 ${approxCO2(result.co2_grams)} | $${cost.toFixed(2)}`;
 
   if (burnRate) {
-    output += ` | ${fmtCO2(burnRate.co2_per_hour)}/hr`;
+    output += ` | ${approxCO2(burnRate.co2_per_hour)}/hr`;
   }
 
   console.log(output);

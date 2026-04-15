@@ -1,16 +1,16 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join, basename } from "node:path";
 import { colors } from "../renderer/colors.js";
-import { fmtCO2 } from "../renderer/format.js";
+import { fmtCO2, approxCO2 } from "../renderer/format.js";
 import { createContext } from "./shared.js";
 
 const BADGE_MARKER_START = "<!-- co2de-badge:start -->";
 const BADGE_MARKER_END = "<!-- co2de-badge:end -->";
 
 function generateBadgeUrl(co2Grams: number): string {
-  const co2Text = `~${fmtCO2(co2Grams)}`;
+  const co2Text = approxCO2(co2Grams);
   const color = co2Grams > 1000 ? "red" : co2Grams > 100 ? "orange" : co2Grams > 10 ? "yellow" : "green";
-  return `https://img.shields.io/badge/CO2-${encodeURIComponent(co2Text)}-${color}`;
+  return `https://img.shields.io/badge/CO%E2%82%82-${encodeURIComponent(co2Text)}-${color}`;
 }
 
 function generateBadgeMarkdown(co2Grams: number): string {
@@ -61,7 +61,7 @@ export async function badgeCommand(options: { inject?: boolean }): Promise<void>
   const totalCO2 = sessions.reduce((s, ses) => s + ses.co2_grams, 0);
 
   if (totalCO2 === 0) {
-    console.log(colors.dim("  No CO2 data for this project."));
+    console.log(colors.dim("  No CO\u2082 data for this project."));
     return;
   }
 
@@ -69,7 +69,7 @@ export async function badgeCommand(options: { inject?: boolean }): Promise<void>
 
   console.log(colors.bold("\n\u{1F4A8} co2de Badge Generator\n"));
   console.log(`  Project: ${projectName}`);
-  console.log(`  Total CO2: ~${fmtCO2(totalCO2)}`);
+  console.log(`  Total CO\u2082: ${approxCO2(totalCO2)}`);
   console.log(`  Sessions: ${sessions.length}`);
   console.log("");
 

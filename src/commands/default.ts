@@ -5,7 +5,7 @@ import { colors, colorForLevel } from "../renderer/colors.js";
 import { getEmissionLevel } from "../core/tone.js";
 import { renderSparkline } from "../renderer/charts.js";
 import {
-  fmtTokens, fmtCO2, fmtCost,
+  fmtTokens, fmtCO2, approxCO2, fmtCost,
   modelTag, coloredCO2,
   precisionBar,
   ansiPadEnd,
@@ -82,7 +82,7 @@ export async function defaultCommand(): Promise<void> {
   // SESSION line
   const sessionModel = ansiPadEnd(modelTag(aggregated.model), 7);
   const gPerLine = linesWritten > 0
-    ? `   ${colors.dim(fmtCO2(sessionResult.co2_grams / linesWritten) + "/line written")}`
+    ? `   ${colors.dim(approxCO2(sessionResult.co2_grams / linesWritten) + "/line written")}`
     : "";
   console.log(
     `  ${colors.bold("SESSION")}   ${sessionModel}  ${fmtTokens(sessionTokens).padStart(7)} tok   ${ansiPadEnd(coloredCO2(sessionResult.co2_grams), 8)}   ${colors.yellow(fmtCost(sessionCost))}${gPerLine}`,
@@ -109,7 +109,7 @@ export async function defaultCommand(): Promise<void> {
   const weekTotal = weekData.reduce((s, v) => s + v, 0);
   const weekSessions = recentSessions.length;
   console.log("");
-  console.log(colors.dim(`  Total this week: ${fmtCO2(weekTotal)} across ${weekSessions} sessions`));
+  console.log(colors.dim(`  Total this week: ${approxCO2(weekTotal)} across ${weekSessions} sessions`));
 
   // SAVED line (if savings data exists)
   if (savingsData && savingsData.worstCase > 0 && savingsData.savedPct > 0) {

@@ -39,13 +39,13 @@ co2_gauge=$(awk -v g="$co2_num" 'BEGIN {
 RED_BG='\\033[41;97;1m'
 MAGENTA_BOLD='\\033[1;35m'
 if [ "$(echo "$co2_num >= 50" | bc -l 2>/dev/null || echo 0)" -eq 1 ]; then
-  co2_part="\${RED_BG:-\\$RED_BG} CO2 \${co2_gauge}\${co2_result} \${RESET}"
+  co2_part="\${RED_BG:-\\$RED_BG} CO\u2082 \${co2_gauge}\${co2_result} \${RESET}"
 elif [ "$(echo "$co2_num >= 10" | bc -l 2>/dev/null || echo 0)" -eq 1 ]; then
-  co2_part="\${MAGENTA_BOLD:-\\$MAGENTA_BOLD}CO2 \${co2_gauge}\${co2_result}\${RESET}"
+  co2_part="\${MAGENTA_BOLD:-\\$MAGENTA_BOLD}CO\u2082 \${co2_gauge}\${co2_result}\${RESET}"
 elif [ "$(echo "$co2_num >= 1" | bc -l 2>/dev/null || echo 0)" -eq 1 ]; then
-  co2_part="\${YELLOW}CO2 \${co2_gauge}\${co2_result}\${RESET}"
+  co2_part="\${YELLOW}CO\u2082 \${co2_gauge}\${co2_result}\${RESET}"
 else
-  co2_part="\${DIM}\${GREEN}CO2 \${co2_gauge}\${co2_result}\${RESET}"
+  co2_part="\${DIM}\${GREEN}CO\u2082 \${co2_gauge}\${co2_result}\${RESET}"
 fi
 # --- end co2de ---`;
 

@@ -13,7 +13,7 @@ export async function budgetCommand(options: {
       return;
     }
     updateConfig({ daily_budget_grams: grams });
-    console.log(`  Daily budget set to ${fmtCO2(grams)} CO2.`);
+    console.log(`  Daily budget set to ${fmtCO2(grams)} CO\u2082.`);
     return;
   }
 
