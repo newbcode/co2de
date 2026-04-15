@@ -3,13 +3,13 @@
 
     #  TIME          MODEL      TOKENS      COST       CO₂
   ───  ────────────  ───────  ────────  ────────  ────────  ────────────
-    1  1d ago        opus        13.5M     $5.40    1.60g  ████████████
-    2  2d ago        haiku        2.8M     $0.28    0.04g  ▎░░░░░░░░░░░
-    3  3d ago        sonnet       6.2M     $3.72    0.22g  █▋░░░░░░░░░░
-    4  4d ago        sonnet       4.5M     $2.70    0.16g  █▎░░░░░░░░░░
-    5  4d ago        opus         8.7M     $5.90    0.58g  ████▍░░░░░░░
-    6  5d ago        haiku        1.2M     $0.12    0.02g  ░░░░░░░░░░░░
-    7  6d ago        sonnet       3.1M     $1.85    0.11g  ▊░░░░░░░░░░░
-    8  6d ago        opus        12.3M     $8.20    0.82g  ██████▏░░░░░
+    1  1d ago        opus        13.5M    $46.90   ~4.65kg  ████████████
+    2  2d ago        haiku        2.8M     $0.14  ~186.64g  ▍░░░░░░░░░░░
+    3  3d ago        sonnet       6.1M     $4.29    ~1.09kg  ██▊░░░░░░░░░
+    4  4d ago        sonnet       4.5M     $3.24  ~802.74g  ██░░░░░░░░░░
+    5  4d ago        opus         8.7M    $32.85    ~3.16kg  ████████░░░░
+    6  5d ago        haiku        1.2M     $0.08   ~91.36g  ▏░░░░░░░░░░░
+    7  6d ago        sonnet       3.1M     $2.35  ~576.46g  █▍░░░░░░░░░░
+    8  6d ago        opus        12.3M    $41.81    ~4.23kg  ███████████░
 
-  This week: 3.55g across 8 sessions ($28.17)
+  This week: ~14.77kg across 8 sessions ($131.66)

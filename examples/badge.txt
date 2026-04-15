@@ -2,11 +2,11 @@
 💨 co2de Badge Generator
 
   Project: nextjs-blog
-  Total CO₂: ~3.55g
+  Total CO₂: ~14.77kg
   Sessions: 8
 
   Badge for your README.md:
 
-  [![co2de carbon badge](https://img.shields.io/badge/CO2-~3.55g-yellow)](https://github.com/anthropics/co2de)
+  [![co2de carbon badge](https://img.shields.io/badge/CO2-~14.77kg-yellow)](https://github.com/anthropics/co2de)
 
   Or run `co2de badge --inject` to auto-insert into README.md

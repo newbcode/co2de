@@ -1,7 +1,7 @@
 # co2de
 
 <!-- co2de-badge:start -->
-[![co2de carbon badge](https://img.shields.io/badge/CO2-~3.55g-yellow)](https://github.com/newbcode/co2de)
+[![co2de carbon badge](https://img.shields.io/badge/CO2-~14.77kg-yellow)](https://github.com/newbcode/co2de)
 <!-- co2de-badge:end -->
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -65,13 +65,13 @@ $ co2de
 
   co2de — Carbon Tracker
 
-  SESSION   opus        13.5M tok   1.60g      $5.40   1.1g/line written
-  PROJECT   8 ses      52.3M tok   3.55g     $28.17
+  SESSION   opus        13.5M tok   ~4.65kg    $46.90   3.19g/line written
+  PROJECT   8 ses      52.3M tok  ~14.77kg   $131.66
 
   WEEK  Mo Tu We Th Fr Sa Su
         █  ▁  ▃  ·  ▁  ▁  ▅
 
-  Total this week: 3.55g across 8 sessions
+  Total this week: ~14.77kg across 8 sessions
 ```
 
 </details>
@@ -86,38 +86,38 @@ $ co2de usage
   2026-04-07 → 2026-04-13
 
 ╔══════════════════════════════════════════════════════════════╗
-║ COST      $28.17     CO₂      ~3.55g     CACHE  93%          ║
+║ COST    $131.66     CO₂    ~14.77kg     CACHE  ~96%          ║
 ║ 8 ses · 1 proj · 52.3M tok             █████████▎            ║
 ╚══════════════════════════════════════════════════════════════╝
 
   PROJECT                SES    TOKENS      COST       CO₂   HIT  EMISSION
   ────────────────────── ───  ────────  ────────  ────────  ────  ────────────────
-  nextjs-blog              8     52.3M    $28.17     3.55g   93%  ████████████████
+  nextjs-blog              8     52.3M   $131.66   ~14.77kg  ~96%  ████████████████
   ────────────────────── ───  ────────  ────────  ────────  ────  ────────────────
-  TOTAL                    8     52.3M    $28.17     3.55g   93%
+  TOTAL                    8     52.3M   $131.66   ~14.77kg  ~96%
 
   SESSION DETAIL
     #  DATE    MODEL      TOKENS       IN      OUT       CW       CR     COST      CO₂   HIT
-  ···  nextjs-blog  — $28.17 · 3.55g · 8 ses
-    1  Apr 13  opus        13.5M     8.2K   285.3K   412.0K    12.8M    $5.40    1.60g   88%  ████████████
-    2  Apr 12  haiku        2.8M     1.4K    42.1K    85.3K     2.7M    $0.28    0.04g   91%  ▎░░░░░░░░░░░
-    3  Apr 11  sonnet       6.2M     3.8K   125.4K   218.5K     5.8M    $3.72    0.22g   93%  █▊░░░░░░░░░░
-    4  Apr  9  sonnet       4.5M     2.1K    98.2K   165.8K     4.2M    $2.70    0.16g   93%  █▎░░░░░░░░░░
-    5  Apr  9  opus         8.7M     5.6K   210.4K   312.5K     8.2M    $5.90    0.58g   94%  ████▍░░░░░░░
-    6  Apr  8  haiku        1.2M       820    32.1K    52.3K     1.1M    $0.12    0.02g   90%  ▏░░░░░░░░░░░
-    7  Apr  7  sonnet       3.1M     1.8K    72.4K   128.5K     2.9M    $1.85    0.11g   92%  ▉░░░░░░░░░░░
-    8  Apr  7  opus        12.3M     6.4K   245.2K   385.1K    11.7M    $8.20    0.82g   95%  ██████▎░░░░░
+  ···  nextjs-blog  — $131.66 · ~14.77kg · 8 ses
+    1  Apr 13  opus        13.5M     8.2K   285.3K   412.0K    12.8M   $46.90   ~4.65kg   97%  ████████████
+    2  Apr 12  haiku        2.8M     1.4K    42.1K    85.3K     2.7M    $0.14  ~186.64g   97%  █▎░░░░░░░░░░
+    3  Apr 11  sonnet       6.1M     3.8K   125.4K   218.5K     5.8M    $4.29    ~1.09kg   96%  ██▊░░░░░░░░░
+    4  Apr  9  sonnet       4.5M     2.1K    98.2K   165.8K     4.2M    $3.24  ~802.74g   96%  ██▏░░░░░░░░░
+    5  Apr  9  opus         8.7M     5.6K   210.4K   312.5K     8.2M   $32.85    ~3.16kg   96%  ████████░░░░
+    6  Apr  8  haiku        1.2M       820    32.1K    52.3K     1.1M    $0.08   ~91.36g   95%  ▋░░░░░░░░░░░
+    7  Apr  7  sonnet       3.1M     1.8K    72.4K   128.5K     2.9M    $2.35  ~576.46g   96%  █▍░░░░░░░░░░
+    8  Apr  7  opus        12.3M     6.4K   245.2K   385.1K    11.7M   $41.81    ~4.23kg   97%  ███████████░
 
   MODEL BREAKDOWN
-  opus     ██████████████████████████  $19.50    34.5M tok   3.00g
-  sonnet   ████████████████░░░░░░░░░░   $8.27    13.8M tok   0.49g
-  haiku    ████░░░░░░░░░░░░░░░░░░░░░░   $0.40     4.0M tok   0.06g
+  opus     ██████████████████████████  $121.56    34.6M tok  ~12.03kg
+  sonnet   ████████████████░░░░░░░░░░    $9.87    13.7M tok   ~2.46kg
+  haiku    ████░░░░░░░░░░░░░░░░░░░░░░    $0.22     4.0M tok   ~0.28kg
 
   INSIGHTS
-  ● Heaviest session: nextjs-blog Apr 13 — 1.60g CO₂
-  ● Most expensive: nextjs-blog Apr  7 — $8.20
-  ● Lowest cache hit: nextjs-blog Apr 13 — 88% (keep stable system prompts)
-  ● Avg per session: ~0.44g
+  ● Heaviest session: nextjs-blog Apr 13 — ~4.65kg CO₂
+  ● Most expensive: nextjs-blog Apr 13 — $46.90
+  ● Lowest cache hit: nextjs-blog Apr  8 — 95% (keep stable system prompts)
+  ● Avg per session: ~1.85kg
 ```
 
 </details>
@@ -128,35 +128,35 @@ $ co2de usage
 ```console
 $ co2de why
 
-💨 co2de — Why 1.60g CO₂?
+💨 co2de — Why ~4.65kg CO₂?
 
 STEP 1: Token Count
-  Input:        12,451 tokens (prompt, context)
-  Output:      285,320 tokens (model responses)
-  Cache R:  12,845,210 tokens (reused context)
-  Cache W:     412,019 tokens (new context)
-  Total:    13,555,000 tokens
+  Input:         8,200 tokens (prompt, context)
+  Output:      285,300 tokens (model responses)
+  Cache R:  12,800,000 tokens (reused context)
+  Cache W:     412,000 tokens (new context)
+  Total:    13,505,500 tokens
 
 STEP 2: Energy Consumption
   Model: claude-opus-4-6 → 0.005 Wh/token
-  Full-price tokens: 709,790 × 0.005 = 3548.95 Wh
-  Cache-read tokens: 12,845,210 × 0.005 × 0.1 = 6422.61 Wh (90% discount)
+  Full-price tokens: 705,500 × 0.005 = 3527.50 Wh
+  Cache-read tokens: 12,800,000 × 0.005 × 0.1 = 6400.00 Wh (90% discount)
   PUE:   × 1.2 (datacenter overhead)
-  Total: 11965.87 Wh = 11.9659 kWh
+  Total: 11913.00 Wh = 11.9130 kWh
 
 STEP 3: Carbon Emission
   Region: us → 390 gCO₂/kWh
-  CO₂:    11.9659 × 390 = 1.60g CO₂e
+  CO₂:    11.9130 × 390 = 4646.07g ≈ ~4.65kg CO₂e
 
 MODEL SUGGESTION
-  If Sonnet:  ~0.80g (50% less)
-  If Haiku:   ~0.32g (80% less)
+  If Sonnet:  ~2.32kg (50% less)
+  If Haiku:   ~0.93kg (80% less)
 
 REGIONAL IMPACT — Same tokens, different grids
-  Your region (us)    ████████████▍░░░░░░░   1.60g   390 gCO₂/kWh
-  France (nuclear)    █▊░░░░░░░░░░░░░░░░░░   0.23g    55 gCO₂/kWh  -86%
-  Norway (hydro)      ▍░░░░░░░░░░░░░░░░░░░   0.04g    10 gCO₂/kWh  -97%
-  India (coal-heavy)  ████████████████████   2.59g   630 gCO₂/kWh  +62%
+  Your region (us)    ████████████▍░░░░░░░   ~4.65kg   390 gCO₂/kWh
+  France (nuclear)    █▊░░░░░░░░░░░░░░░░░░   ~0.66kg    55 gCO₂/kWh  -86%
+  Norway (hydro)      ▍░░░░░░░░░░░░░░░░░░░   ~0.12kg    10 gCO₂/kWh  -97%
+  India (coal-heavy)  ████████████████████   ~7.51kg   630 gCO₂/kWh  +62%
 
   NOTE
   Token-based CO₂ is an approximation (R²≈0.44 vs actual energy).
@@ -173,20 +173,20 @@ $ co2de savings
 
   CARBON SAVINGS  Past 7 Days
 
-  ACTUAL    █████░░░░░░░░░░░░░░░  3.55g
-  WORST     ████████████████████  15.12g (all-opus, no cache)
-  SAVED     ███████████████░░░░░  11.57g (77%)
+  ACTUAL    █████░░░░░░░░░░░░░░░  ~14.77kg
+  WORST*    ████████████████████  ~122.38kg (hypothetical: all-opus, no cache)
+  SAVED     ███████████████░░░░░  ~107.61kg (88%)
 
   BREAKDOWN
-  Cache reuse          ██████████████  9.71g saved
-  Lighter models       ██████░░░░░░░░  1.86g saved
+  Cache reuse          ██████████████  ~84.05kg saved
+  Lighter models       ██████░░░░░░░░   ~3.58kg saved
 
-  Cache hit rate: 93% — higher = more savings
+  Cache hit rate: ~96% — higher = more savings
   Excellent efficiency. Cache reuse is saving most of your energy.
 
   ACTUAL = cache reads at 10% energy + real model
-  WORST  = all Opus + no cache (every token full price)
-  SAVED  = WORST − ACTUAL
+  WORST* = all Opus + no cache (every token full price)
+  SAVED  = WORST* − ACTUAL
 ```
 
 </details>
@@ -202,17 +202,17 @@ $ co2de compare
   ~1,456 lines written with AI assistance
 
   AI coding:
-    ~1.60g CO₂  (~0.0011g/line)
-    13,555,000 tokens over 42 min (wall clock, includes idle)
+    ~4.65kg CO₂  (~3.19g/line)
+    13,505,500 tokens over 42 min (wall clock, includes idle)
 
   Hand coding estimate:
-    ~0.095g CO₂  (~0.000065g/line)
+    ~94.64g CO₂  (~0.065g/line)
     ~8.1 hours (laptop 30W only, typing at 3 lines/min)
 
-  Hand  █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  0.095g
-  AI    ██████████████████████████████  1.60g
+  Hand  █░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  94.64g
+  AI    ██████████████████████████████  4.65kg
 
-  AI: ~17x more CO₂, ~12x faster
+  AI: ~49x more CO₂, ~12x faster
 
   Caveats:
   AI CO₂ includes all tokens (conversation, file reads, thinking)
@@ -232,16 +232,16 @@ $ co2de log
 
     #  TIME          MODEL      TOKENS      COST       CO₂
   ───  ────────────  ───────  ────────  ────────  ────────  ────────────
-    1  1d ago        opus        13.5M     $5.40    1.60g  ████████████
-    2  2d ago        haiku        2.8M     $0.28    0.04g  ▎░░░░░░░░░░░
-    3  3d ago        sonnet       6.2M     $3.72    0.22g  █▋░░░░░░░░░░
-    4  4d ago        sonnet       4.5M     $2.70    0.16g  █▎░░░░░░░░░░
-    5  4d ago        opus         8.7M     $5.90    0.58g  ████▍░░░░░░░
-    6  5d ago        haiku        1.2M     $0.12    0.02g  ░░░░░░░░░░░░
-    7  6d ago        sonnet       3.1M     $1.85    0.11g  ▊░░░░░░░░░░░
-    8  6d ago        opus        12.3M     $8.20    0.82g  ██████▏░░░░░
+    1  1d ago        opus        13.5M    $46.90   ~4.65kg  ████████████
+    2  2d ago        haiku        2.8M     $0.14  ~186.64g  ▍░░░░░░░░░░░
+    3  3d ago        sonnet       6.1M     $4.29    ~1.09kg  ██▊░░░░░░░░░
+    4  4d ago        sonnet       4.5M     $3.24  ~802.74g  ██░░░░░░░░░░
+    5  4d ago        opus         8.7M    $32.85    ~3.16kg  ████████░░░░
+    6  5d ago        haiku        1.2M     $0.08   ~91.36g  ▏░░░░░░░░░░░
+    7  6d ago        sonnet       3.1M     $2.35  ~576.46g  █▍░░░░░░░░░░
+    8  6d ago        opus        12.3M    $41.81    ~4.23kg  ███████████░
 
-  This week: 3.55g across 8 sessions ($28.17)
+  This week: ~14.77kg across 8 sessions ($131.66)
 
 $ co2de weekly
 
@@ -250,17 +250,17 @@ $ co2de weekly
 
   DATE        SESSIONS     TOKENS        CO₂      COST
   ──────────  ────────   ────────   ────────  ────────  ────────────────
-  Mon Apr  7         2     15.4M     0.93g    $10.05  ████████████████
-  Tue Apr  8         1      1.2M     0.02g     $0.12  ▎░░░░░░░░░░░░░░░
-  Wed Apr  9         2     13.2M     0.74g     $8.60  ████████████▋░░░
+  Mon Apr  7         2     15.4M    ~4.80kg   $44.16  ████████████████
+  Tue Apr  8         1      1.2M   ~91.36g    $0.08  ▎░░░░░░░░░░░░░░░
+  Wed Apr  9         2     13.2M    ~3.96kg   $36.09  █████████████▏░░
   Thu Apr 10         -          -         -         -
-  Fri Apr 11         1      6.2M     0.22g     $3.72  ███▊░░░░░░░░░░░░
-  Sat Apr 12         1      2.8M     0.04g     $0.28  ▋░░░░░░░░░░░░░░░
-  Sun Apr 13         1     13.5M     1.60g     $5.40  ████████████████
+  Fri Apr 11         1      6.1M    ~1.09kg    $4.29  ███▋░░░░░░░░░░░░
+  Sat Apr 12         1      2.8M  ~186.64g    $0.14  ▋░░░░░░░░░░░░░░░
+  Sun Apr 13         1     13.5M    ~4.65kg   $46.90  ████████████████
   ──────────  ────────   ────────   ────────  ────────  ────────────────
-  TOTAL              8     52.3M     3.55g    $28.17
+  TOTAL              8     52.3M   ~14.77kg  $131.66
 
-  Avg: 0.71g/day · Peak: Sun (1.60g)
+  Avg: ~2.46kg/day · Peak: Sun (~4.65kg)
 
 $ co2de audit
 

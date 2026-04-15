@@ -2,4 +2,4 @@
   DAILY CARBON BUDGET
   No budget set. Use `co2de budget --set 50` to set a daily limit.
 
-  Today's usage: 1.60g across 1 session
+  Today's usage: ~4.65kg across 1 session

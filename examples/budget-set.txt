@@ -2,11 +2,11 @@
   DAILY CARBON BUDGET
   Budget: 10g/day
 
-  TODAY   ███░░░░░░░░░░░░░░░░░ 1.60g / 10g (16%)
+  TODAY   ████████████████████ ~4.65kg / 10g (4650%)
 
   BREAKDOWN BY TIME
   Morning    ░░░░░░░░░░░░   0.0mg    0 ses
-  Afternoon  ████████████   1.60g    1 ses
+  Afternoon  ████████████   ~4.65kg    1 ses
   Evening    ░░░░░░░░░░░░   0.0mg    0 ses
 
-  Status: On track — 8.40g remaining
+  Status: OVER BUDGET — exceeded by ~4.64kg

@@ -10,7 +10,7 @@
   Sa  ░ ░   ░
   Su        ░   █
 
-  ░ <0.46g  ▒ <0.93g  ▓ <1.39g  █ 1.39g+
+  ░ <1.20kg  ▒ <2.40kg  ▓ <3.60kg  █ 3.60kg+
 
-  Total: ~10.2g | avg ~0.38g/day
-  Heaviest: 2026-04-13 (~1.60g)
+  Total: ~14.77kg | avg ~2.46kg/day
+  Heaviest: 2026-04-13 (~4.65kg)

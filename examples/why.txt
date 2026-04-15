@@ -1,42 +1,42 @@
 
-💨 co2de — Why 1.60g CO₂?
+💨 co2de — Why ~4.65kg CO₂?
 
 STEP 1: Token Count
-  Input:        12,451 tokens (prompt, context)
-  Output:      285,320 tokens (model responses)
-  Cache R:  12,845,210 tokens (reused context)
-  Cache W:     412,019 tokens (new context)
-  Total:    13,555,000 tokens
+  Input:         8,200 tokens (prompt, context)
+  Output:      285,300 tokens (model responses)
+  Cache R:  12,800,000 tokens (reused context)
+  Cache W:     412,000 tokens (new context)
+  Total:    13,505,500 tokens
 
 STEP 2: Energy Consumption
   Model: claude-opus-4-6 → 0.005 Wh/token
-  Full-price tokens: 709,790 × 0.005 = 3548.95 Wh
-  Cache-read tokens: 12,845,210 × 0.005 × 0.1 = 6422.61 Wh (90% discount)
+  Full-price tokens: 705,500 × 0.005 = 3527.50 Wh
+  Cache-read tokens: 12,800,000 × 0.005 × 0.1 = 6400.00 Wh (90% discount)
   PUE:   × 1.2 (datacenter overhead)
-  Total: 11965.87 Wh = 11.9659 kWh
+  Total: 11913.00 Wh = 11.9130 kWh
 
 STEP 3: Carbon Emission
   Region: us → 390 gCO₂/kWh
-  CO₂:    11.9659 × 390 = 1.60g CO₂e
+  CO₂:    11.9130 × 390 = 4646.07g ≈ ~4.65kg CO₂e
 
 MODEL SUGGESTION
-  If Sonnet:  ~0.80g (50% less)
-  If Haiku:   ~0.32g (80% less)
+  If Sonnet:  ~2.32kg (50% less)
+  If Haiku:   ~0.93kg (80% less)
   Was this model necessary for this task?
 
 COMPARISONS
-  🌳 A tree absorbs this in 2.3 seconds
-  🚗 Same as driving a car 13.3m
-  🔍 Equivalent to 8.0 Google searches
-  📱 0.20 smartphone charges
-  📺 2.7 minutes of Netflix streaming
-  💡 0.16 hours of an LED bulb
+  🌳 A tree absorbs this in 1851.2 hrs
+  🚗 Same as driving a car 38.7 km
+  🔍 Equivalent to 23,230 Google searches
+  📱 581 smartphone charges
+  📺 129.1 hours of Netflix streaming
+  💡 465 hours of an LED bulb
 
 REGIONAL IMPACT — Same tokens, different grids
-  Your region (us)    ████████████▍░░░░░░░   1.60g   390 gCO₂/kWh
-  France (nuclear)    █▊░░░░░░░░░░░░░░░░░░   0.23g    55 gCO₂/kWh  -86%
-  Norway (hydro)      ▍░░░░░░░░░░░░░░░░░░░   0.04g    10 gCO₂/kWh  -97%
-  India (coal-heavy)  ████████████████████   2.59g   630 gCO₂/kWh  +62%
+  Your region (us)    ████████████▍░░░░░░░   ~4.65kg   390 gCO₂/kWh
+  France (nuclear)    █▊░░░░░░░░░░░░░░░░░░   ~0.66kg    55 gCO₂/kWh  -86%
+  Norway (hydro)      ▍░░░░░░░░░░░░░░░░░░░   ~0.12kg    10 gCO₂/kWh  -97%
+  India (coal-heavy)  ████████████████████   ~7.51kg   630 gCO₂/kWh  +62%
 
   Anthropic's US datacenter grid: ~390 gCO₂/kWh.
   Your region setting affects the DISPLAY only — actual emissions

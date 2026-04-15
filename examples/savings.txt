@@ -1,18 +1,18 @@
 
   CARBON SAVINGS  Past 7 Days
 
-  ACTUAL    █████░░░░░░░░░░░░░░░  3.55g
-  WORST     ████████████████████  15.12g (all-opus, no cache)
-  SAVED     ███████████████░░░░░  11.57g (77%)
+  ACTUAL    █████░░░░░░░░░░░░░░░  ~14.77kg
+  WORST*    ████████████████████  ~122.38kg (hypothetical: all-opus, no cache)
+  SAVED     ███████████████░░░░░  ~107.61kg (88%)
 
   BREAKDOWN
 
-  Cache reuse          ██████████████  9.71g saved
-  Lighter models       ██████░░░░░░░░  1.86g saved
+  Cache reuse          ██████████████  ~84.05kg saved
+  Lighter models       ██████░░░░░░░░   ~3.58kg saved
 
-  Cache hit rate: 93% — higher = more savings
+  Cache hit rate: ~96% — higher = more savings
   Excellent efficiency. Cache reuse is saving most of your energy.
 
   ACTUAL = cache reads at 10% energy + real model
-  WORST  = all Opus + no cache (every token full price)
-  SAVED  = WORST − ACTUAL
+  WORST* = all Opus + no cache (every token full price)
+  SAVED  = WORST* − ACTUAL
