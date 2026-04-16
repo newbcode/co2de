@@ -164,3 +164,47 @@ export function coloredCO2(grams: number): string {
 export function approxCO2(grams: number): string {
   return "~" + fmtCO2(grams);
 }
+
+// ─── Pace (Annual Projection) ────────────────────────────
+
+/** Format an annual projection like "~768 kg/yr" or "~1.2 t/yr". */
+export function fmtPace(annualGrams: number): string {
+  if (annualGrams >= 1_000_000) return `~${(annualGrams / 1_000_000).toFixed(1)} t/yr`;
+  if (annualGrams >= 1_000) return `~${Math.round(annualGrams / 1000)} kg/yr`;
+  return `~${Math.round(annualGrams)} g/yr`;
+}
+
+// ─── Fermi Equivalency Trio ──────────────────────────────
+
+/**
+ * Pick three diverse equivalents for a CO2 amount.
+ *
+ * Per Chen et al. (CHI 2023), raw grams beat any single metaphor at
+ * driving behavior. Metaphors work only as *secondary* comprehension
+ * aids. We pick one from each of three distinct domains (transport,
+ * digital, ambient) so the trio spans contexts rather than reinforcing
+ * a single frame.
+ */
+export function fermiTrio(grams: number): string {
+  if (grams <= 0) return "";
+
+  // Transport: km if big, meters otherwise
+  const carKm = grams / 120; // 120 g/km
+  const car = carKm >= 1
+    ? `${carKm.toFixed(carKm >= 10 ? 0 : 1)} km highway drive`
+    : `${Math.round(carKm * 1000)} m highway drive`;
+
+  // Digital: Netflix hours, or Google searches for tiny amounts
+  const netflixHours = grams / 36;
+  const digital = netflixHours >= 0.5
+    ? `${netflixHours.toFixed(netflixHours >= 10 ? 0 : 1)} h Netflix HD`
+    : `${Math.round(grams / 0.2)} Google searches`;
+
+  // Ambient: LED bulb hours, or phone charges for tiny amounts
+  const ledHours = grams / 10;
+  const ambient = ledHours >= 1
+    ? `${ledHours.toFixed(ledHours >= 10 ? 0 : 1)} h LED bulb`
+    : `${(grams / 8).toFixed(1)} phone charges`;
+
+  return `${car} · ${digital} · ${ambient}`;
+}

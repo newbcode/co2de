@@ -1,8 +1,25 @@
 import { calculateSavings } from "../engine/savings-tracker.js";
+import { computePace } from "../engine/pace.js";
 import { colors } from "../renderer/colors.js";
-import { fmtCO2, approxCO2, precisionBar, sectionHeader, coloredCO2 } from "../renderer/format.js";
+import { approxCO2, precisionBar, sectionHeader, coloredCO2, fmtPace } from "../renderer/format.js";
 import { createContext, daysAgo, collectAllEntries } from "./shared.js";
 
+/**
+ * Emission range audit — the honest version of "savings".
+ *
+ * Previous framing celebrated a percentage saved against a hypothetical worst
+ * case. That triggers moral licensing (Schultz/Opower): users who see a green
+ * "88% saved" badge compensate by using more afterwards.
+ *
+ * New framing presents the same data as three bounded facts:
+ *   1. Your actual emissions (what happened)
+ *   2. IF-WORST ceiling  (hypothetical: all-opus, zero cache)
+ *   3. The gap, broken down by source
+ *
+ * No verdicts, no congratulations, no green "saved" label. The gap breakdown
+ * stays informational — it says "these components are already low-cost",
+ * not "you won."
+ */
 export async function savingsCommand(): Promise<void> {
   const { config, adapter } = createContext();
   const now = new Date();
@@ -14,35 +31,36 @@ export async function savingsCommand(): Promise<void> {
   }
 
   const allEntries = await collectAllEntries(adapter, sessions);
-
   const report = calculateSavings(allEntries, config.region);
+  const pace = computePace(sessions);
 
   const actual = report.actual_co2_grams;
   const worst = report.worst_case_co2_grams;
-  const saved = report.saved_co2_grams;
-  const pct = worst > 0 ? Math.round((saved / worst) * 100) : 0;
+  const gap = report.saved_co2_grams;
 
   const barWidth = 20;
 
-  console.log(sectionHeader("CARBON SAVINGS", "Past 7 Days"));
+  console.log(sectionHeader("CARBON RANGE AUDIT", "Past 7 Days"));
   console.log("");
 
-  // ACTUAL bar
+  // YOUR WEEK — actual, neutral color
   console.log(
-    `  ACTUAL    ${precisionBar(actual, worst, barWidth, colors.yellow)}  ${coloredCO2(actual)}`,
+    `  YOUR WEEK   ${precisionBar(actual, worst, barWidth, colors.yellow)}  ${coloredCO2(actual)}`,
   );
-  // WORST bar (hypothetical ceiling)
+  // IF-WORST — hypothetical ceiling, red-framed as a bound not a threat
   console.log(
-    `  WORST*    ${precisionBar(worst, worst, barWidth, colors.red)}  ${approxCO2(worst)} ${colors.dim("(hypothetical: all-opus, no cache)")}`,
+    `  IF-WORST*   ${precisionBar(worst, worst, barWidth, colors.red)}  ${approxCO2(worst)} ${colors.dim("all-opus, no cache")}`,
   );
-  // SAVED bar
-  console.log(
-    `  SAVED     ${precisionBar(saved, worst, barWidth, colors.green)}  ${colors.green(approxCO2(saved))} ${colors.green(`(${pct}%)`)}`,
-  );
+  // GAP — the difference, neutral
+  if (gap > 0) {
+    console.log(
+      `  GAP         ${precisionBar(gap, worst, barWidth, colors.dim)}  ${approxCO2(gap)} ${colors.dim("same workload, different habits")}`,
+    );
+  }
 
-  // Breakdown section
+  // Breakdown — factual, no celebration color
   if (report.savings_breakdown.length > 0) {
-    console.log(sectionHeader("BREAKDOWN"));
+    console.log(sectionHeader("GAP BREAKDOWN"));
     console.log("");
 
     const maxSaved = Math.max(...report.savings_breakdown.map((b) => b.saved_grams));
@@ -51,38 +69,29 @@ export async function savingsCommand(): Promise<void> {
 
     for (const item of report.savings_breakdown) {
       const label = item.category.padEnd(labelWidth);
-      const bar = precisionBar(item.saved_grams, maxSaved, breakdownBarWidth, colors.green);
-      const value = approxCO2(item.saved_grams);
-      console.log(`  ${label}${bar}  ${colors.green(value)} saved`);
+      const bar = precisionBar(item.saved_grams, maxSaved, breakdownBarWidth, colors.dim);
+      console.log(`  ${label}${bar}  ${approxCO2(item.saved_grams)}`);
     }
-  } else {
-    console.log("");
-    console.log(colors.dim("  No measurable savings detected."));
-    console.log(colors.dim("  Try using lighter models (Haiku/Sonnet) for simple tasks."));
   }
 
-  // Cache hit context
+  // Cache context — observation, not cheerleading
   const totalCR = allEntries.reduce((s, e) => s + e.cache_read_tokens, 0);
   const totalInput = allEntries.reduce((s, e) => s + e.input_tokens + e.cache_write_tokens + e.cache_read_tokens, 0);
   const cacheHit = totalInput > 0 ? (totalCR / totalInput) * 100 : 0;
 
   console.log("");
-  console.log(`  Cache hit rate: ${colors.green(cacheHit.toFixed(0) + "%")} ${colors.dim("— higher = more savings")}`);
+  console.log(`  Cache hit rate: ${cacheHit.toFixed(0)}% ${colors.dim("— determined by client + TTL, not prompts")}`);
 
-  // Verdict
-  if (pct >= 80) {
-    console.log(`  ${colors.green("Excellent efficiency.")} Cache reuse is saving most of your energy.`);
-  } else if (pct >= 50) {
-    console.log(`  ${colors.yellow("Good efficiency.")} Consider lighter models for simple tasks.`);
-  } else if (pct > 0) {
-    console.log(`  ${colors.red("Low efficiency.")} High Opus usage with little cache reuse.`);
+  // Pace — escape the "one week = trivial" dismissal
+  if (pace.weekly_grams > 0) {
+    console.log(`  At this rate: ${colors.bold(fmtPace(pace.annual_grams))}`);
   }
 
   // Explanation
   console.log("");
-  console.log(colors.dim("  ACTUAL  = cache reads at 10% energy + real model"));
-  console.log(colors.dim("  WORST*  = hypothetical ceiling: all Opus + no cache (every token full price)"));
-  console.log(colors.dim("  SAVED   = WORST* − ACTUAL"));
-  console.log(colors.dim("  * Worst-case is deliberately extreme. Most users would never hit this ceiling."));
+  console.log(colors.dim("  YOUR WEEK  cache reads at 10% energy + real model"));
+  console.log(colors.dim("  IF-WORST*  hypothetical ceiling — all Opus, no cache"));
+  console.log(colors.dim("  GAP        IF-WORST − YOUR WEEK · shows the range, not a claim of savings"));
+  console.log(colors.dim("  * Most workloads would never reach IF-WORST."));
   console.log("");
 }

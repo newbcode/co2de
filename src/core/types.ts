@@ -101,3 +101,20 @@ export interface Co2deConfig {
 
 /** Emission level for design tone system */
 export type EmissionLevel = "low" | "medium" | "high" | "extreme";
+
+/** Annual projection from a period's observed emissions */
+export interface PaceProjection {
+  weekly_grams: number;          // observed weekly total
+  annual_grams: number;          // weekly × 52
+  sessions_observed: number;
+}
+
+/** Self-comparison delta vs a user's own baseline */
+export interface DeltaBadge {
+  glyph: "·" | "▲" | "⚠";        // baseline / above / heavy
+  multiplier: number;             // latest / baseline
+  baseline_grams: number;
+  sample_size: number;
+  confident: boolean;             // false if sample_size < 5
+}
+

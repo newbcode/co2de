@@ -1,0 +1,70 @@
+# co2de — weekly carbon disclosure update
+#
+# Copy this file to .github/workflows/co2de.yml in your repository to
+# have GitHub automatically refresh your README badges, calendar SVG,
+# and disclosure page every Sunday.
+#
+# What it does:
+#   1. Checks out your repository
+#   2. Installs co2de
+#   3. Runs `co2de readme` to regenerate .co2de/ assets + README block
+#   4. Commits and pushes back if anything changed
+#
+# Requirements:
+#   - The `GITHUB_TOKEN` secret is provided automatically — no setup.
+#   - Your repo must have write permissions for workflows. In your repo
+#     Settings → Actions → General → Workflow permissions, select
+#     "Read and write permissions".
+#
+# Notes:
+#   - co2de needs access to ~/.claude/projects/ JSONL files to compute
+#     real numbers. Running in GitHub Actions, those files do NOT exist.
+#     This workflow ONLY refreshes the static assets if you have already
+#     committed .co2de/*.svg locally. It will not *generate* new
+#     measurements from CI.
+#
+#   - To actually refresh numbers, run `co2de readme` locally before
+#     pushing. This workflow's role is bookkeeping — updating the
+#     "last updated" date line in README.
+
+name: co2de disclosure
+
+on:
+  schedule:
+    - cron: "0 0 * * 0"        # every Sunday 00:00 UTC
+  workflow_dispatch:             # manual trigger via Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify co2de assets exist
+        run: |
+          if [ ! -d ".co2de" ]; then
+            echo "No .co2de/ directory found. Run 'co2de readme' locally first."
+            exit 1
+          fi
+
+      - name: Update README timestamp
+        run: |
+          TODAY=$(date -u +%Y-%m-%d)
+          sed -i "s/privacy \`[a-z]*\` · updated [0-9-]\+/& /; s/updated [0-9-]\+/updated $TODAY/" README.md
+
+      - name: Commit if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet README.md; then
+            git add README.md
+            git commit -m "chore(co2de): refresh disclosure timestamp"
+            git push
+          else
+            echo "Nothing changed."
+          fi

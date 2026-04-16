@@ -344,6 +344,44 @@ export function decodeProjectName(dirName: string): string {
 }
 
 /**
+ * Collect detailed sessions for a single project path (cwd-style).
+ *
+ * This is the per-repo view used by `co2de readme` and the default
+ * `co2de dashboard` scope. Returns [] if no sessions match the path.
+ */
+export function collectProjectSessions(
+  projectPath: string,
+  from?: Date,
+  to?: Date,
+  region = "global",
+): DetailedSession[] {
+  const projectDir = getProjectDir(projectPath);
+  if (!existsSync(projectDir)) return [];
+
+  const dirName = basename(projectDir);
+  const projectName = decodeProjectName(dirName);
+  const sessions: DetailedSession[] = [];
+
+  for (const file of listSessionFiles(projectDir)) {
+    const detail = getDetailedSession(file, projectName, region);
+    if (!detail) continue;
+    if (detail.total_tokens === 0) continue;
+
+    if (from || to) {
+      const ts = new Date(detail.last_activity);
+      if (from && ts < from) continue;
+      if (to && ts > to) continue;
+    }
+
+    sessions.push(detail);
+  }
+
+  return sessions.sort(
+    (a, b) => new Date(b.last_activity).getTime() - new Date(a.last_activity).getTime(),
+  );
+}
+
+/**
  * Collect all detailed sessions across all projects.
  */
 export function collectAllSessions(from?: Date, to?: Date, region = "global"): DetailedSession[] {

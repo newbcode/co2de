@@ -15,6 +15,11 @@ import { exportCommand } from "./commands/export.js";
 import { weeklyCommand } from "./commands/weekly.js";
 import { statuslineCommand } from "./commands/statusline.js";
 import { usageCommand } from "./commands/usage.js";
+import { tipsCommand } from "./commands/tips.js";
+import { traceCommand } from "./commands/trace.js";
+import { dashboardCommand } from "./commands/dashboard.js";
+import { serveCommand } from "./commands/serve.js";
+import { readmeCommand } from "./commands/readme.js";
 
 export function createProgram(): Command {
   const program = new Command();
@@ -24,7 +29,9 @@ export function createProgram(): Command {
     .description("Track the carbon cost of vibe coding, one token at a time.")
     .version("0.1.0");
 
-  program.action(defaultCommand);
+  program
+    .option("--all", "Aggregate every project (default: current project only)")
+    .action(defaultCommand);
 
   program.command("why")
     .description("Explain WHY this much CO\u2082 was emitted — full calculation breakdown")
@@ -61,8 +68,10 @@ export function createProgram(): Command {
     .action(savingsCommand);
 
   program.command("badge")
-    .description("Generate README carbon badge")
-    .option("--inject", "Auto-insert/update badge in README.md")
+    .description("Generate README carbon badge (self-hosted SVG)")
+    .option("--type <type>", "Badge type: pace | lean | stable | concise | disclosed | all", "pace")
+    .option("--save", "Write SVG file(s) to .co2de/")
+    .option("--inject", "Auto-insert/update badge block in README.md (implies --save)")
     .action(badgeCommand);
 
 
@@ -92,6 +101,37 @@ export function createProgram(): Command {
     .option("--week", "Past 7 days (default)")
     .option("--month", "Past 30 days")
     .action(usageCommand);
+
+  program.command("tips [category]")
+    .description("Prompt-craft playbook — concrete rewrites that cut tokens")
+    .action(tipsCommand);
+
+  program.command("trace [sessionId]")
+    .description("Per-turn emission timeline for a session (default: latest)")
+    .action(traceCommand);
+
+  program.command("dashboard")
+    .description("Generate interactive Soot Ledger HTML dashboard (default: current project)")
+    .option("--month", "Past 30 days (default: past 7)")
+    .option("--all", "All projects combined (default: current project only)")
+    .option("--demo", "Use demo data with a filled 30-day calendar")
+    .option("--no-open", "Do not auto-open in browser")
+    .action(dashboardCommand);
+
+  program.command("serve")
+    .description("Start a local server that live-reloads the Soot Ledger (default: current project)")
+    .option("--port <port>", "Port number (default: 4869)", "4869")
+    .option("--month", "Past 30 days (default: past 7)")
+    .option("--all", "All projects combined (default: current project only)")
+    .option("--demo", "Serve demo data with a filled 30-day calendar")
+    .option("--no-open", "Do not auto-open in browser")
+    .action(serveCommand);
+
+  program.command("readme")
+    .description("One-shot: generate badges + calendar + disclosure page, inject block into README.md")
+    .option("--show <level>", "Privacy: full | bucketed | weekly | disclosed", "bucketed")
+    .option("--remove", "Remove the co2de block from README.md")
+    .action(readmeCommand);
 
   return program;
 }
