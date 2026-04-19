@@ -29,7 +29,33 @@ const SOOT_RGB: [number, number, number][] = [
   [201, 69, 31],
 ];
 const RUST_TODAY: [number, number, number] = [215, 90, 40];
+const EMPTY_BG: [number, number, number] = [45, 40, 36];   // very faint paper
 
+/** ANSI 24-bit background color wrap. */
+function bg(rgb: [number, number, number], inner: string): string {
+  const [r, g, b] = rgb;
+  return `\x1b[48;2;${r};${g};${b}m${inner}\x1b[0m`;
+}
+
+// Emoji mode: 👣 (U+1F463) with a soot-colored background tile.
+// Width is fixed 2 cols because the emoji is always 2-wide; empty
+// cells emit "  " (two spaces) on the same background so columns align.
+const FOOTPRINT = "\uD83D\uDC63";       // 👣
+const EMOJI_CELL_W = 2;
+
+function emojiCell(intensity: number): string {
+  return bg(SOOT_RGB[intensity], FOOTPRINT);
+}
+function emojiToday(): string {
+  return bg(RUST_TODAY, FOOTPRINT);
+}
+// Empty cells stay fully transparent — active footprints pop, whole grid
+// doesn't become a solid colored tile block like GitHub's contributions.
+function emojiEmpty(): string {
+  return " ".repeat(EMOJI_CELL_W);
+}
+
+// Plain ASCII heatmap (pre-emoji fallback) — single ● per cell.
 function sootChar(intensity: number): string {
   const [r, g, b] = SOOT_RGB[intensity];
   return chalk.rgb(r, g, b).bold("\u25CF");
@@ -104,7 +130,13 @@ function svgToPng(svg: string, widthPx: number): Buffer {
   const resvg = new Resvg(svg, {
     fitTo: { mode: "width", value: widthPx },
     background: "#f7f5f0",
-    font: { loadSystemFonts: false },
+    // loadSystemFonts: true — required for month + day-of-week labels.
+    // Without it, resvg ships no default font and every <text> element
+    // disappears from the rendered PNG.
+    font: {
+      loadSystemFonts: true,
+      defaultFontFamily: "Helvetica",
+    },
   });
   return resvg.render().asPng();
 }
@@ -136,7 +168,84 @@ function kittyImage(pngBytes: Buffer): string {
   return out.join("");
 }
 
-// ── ASCII heatmap fallback ────────────────────────────────
+// ── Emoji render (default) ────────────────────────────────
+
+function renderEmoji(
+  days: DashboardDay[],
+  totalKg: number,
+  sessionCount: number,
+  scopeLabel: string,
+): void {
+  if (days.length === 0) {
+    console.log(colors.dim("  No footprint data for this scope."));
+    return;
+  }
+
+  const weeks: (DashboardDay | null)[][] = [];
+  let wk: (DashboardDay | null)[] = new Array(7).fill(null);
+  for (const day of days) {
+    wk[day.dayOfWeek] = day;
+    if (day.dayOfWeek === 6) {
+      weeks.push(wk);
+      wk = new Array(7).fill(null);
+    }
+  }
+  if (wk.some((x) => x !== null)) weeks.push(wk);
+
+  const maxKg = Math.max(0.001, ...days.map((d) => d.kg));
+
+  // Month label row — stride is 2 chars per week to match emoji width.
+  const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const monthRow: string[] = [];
+  let prevMonth = -1;
+  let skipLeft = 0;
+  weeks.forEach((week) => {
+    if (skipLeft > 0) { skipLeft--; return; }
+    const firstDay = week.find((d): d is DashboardDay => d !== null);
+    const m = firstDay ? new Date(firstDay.date).getMonth() : -1;
+    if (m !== -1 && m !== prevMonth) {
+      const lbl = MON[m].padEnd(2 * 2, " ");
+      monthRow.push(lbl);
+      skipLeft = 1; // label takes ~2 week-columns of visual space
+      prevMonth = m;
+    } else {
+      monthRow.push("  ");
+    }
+  });
+
+  console.log("");
+  console.log(sectionHeader(
+    "CARBON FOOTPRINT",
+    `last year · ${scopeLabel} · ~${totalKg.toFixed(1)} kg · ${sessionCount} sessions`,
+  ));
+  console.log("");
+
+  // Gutter: 5 chars left (label col + 1 space)
+  const GUTTER = " ".repeat(5);
+  console.log(GUTTER + colors.dim(monthRow.join("")));
+
+  const DOW_LABELS = ["Mon", "   ", "Wed", "   ", "Fri", "   ", "   "];
+  for (let r = 0; r < 7; r++) {
+    const cells = weeks.map((week) => {
+      const day = week[r];
+      if (!day) return "  ";
+      if (day.isToday) return emojiToday();
+      if (day.kg <= 0) return emojiEmpty();
+      return emojiCell(bucketIntensity(day.kg, maxKg));
+    }).join("");
+    console.log(`  ${colors.dim(DOW_LABELS[r])} ` + cells);
+  }
+
+  console.log("");
+  const legend = [0, 1, 2, 3, 4].map((i) => emojiCell(i)).join("");
+  console.log(
+    `     ${colors.dim("lighter")}  ${legend}  ${colors.dim("darker")}   ` +
+    colors.dim("👣 = 1 day · blank = no trace"),
+  );
+  console.log("");
+}
+
+// ── ASCII heatmap fallback (pre-emoji terminals) ──────────
 
 function renderAscii(
   days: DashboardDay[],
@@ -268,20 +377,26 @@ export async function footprintCommand(options: {
   const scopeLabel = options.all ? "all projects" : (sessions[0]?.project ?? "project");
   const days = buildYearCalendar(sessions);
 
-  // Mode resolution: explicit flag wins, otherwise auto-detect terminal.
-  const auto = detectImageCapability();
-  const wantImage = options.image || (!options.ascii && auto !== "none");
-  const capability = options.image && auto === "none" ? "iterm2" : auto;
-
-  if (wantImage) {
+  // Mode resolution:
+  //   --image  → force inline PNG (iTerm2/WezTerm/Kitty)
+  //   --ascii  → force plain ● heatmap
+  //   default  → 👣 emoji with soot backgrounds (creative, readable,
+  //              works on any modern terminal with emoji support)
+  if (options.image) {
+    const auto = detectImageCapability();
+    const capability = auto === "none" ? "iterm2" : auto;
     try {
       renderImage(days, totalKg, sessions.length, scopeLabel, capability);
       return;
     } catch (err) {
       console.log(colors.dim(
-        `  (inline image failed: ${err instanceof Error ? err.message : String(err)} — falling back to ASCII)`,
+        `  (inline image failed: ${err instanceof Error ? err.message : String(err)} — falling back to emoji)`,
       ));
     }
   }
-  renderAscii(days, totalKg, sessions.length, scopeLabel);
+  if (options.ascii) {
+    renderAscii(days, totalKg, sessions.length, scopeLabel);
+    return;
+  }
+  renderEmoji(days, totalKg, sessions.length, scopeLabel);
 }

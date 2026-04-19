@@ -15,7 +15,7 @@ import type { DashboardDay } from "../dashboard/data.js";
 export type PrivacyLevel = "full" | "bucketed" | "weekly" | "disclosed";
 
 const SOOT = ['#c0b6a2', '#8a7a65', '#4d3f30', '#231810', '#8b3a1a'];
-const EMPTY_CELL_FILL = "rgba(58,51,44,0.07)";
+const EMPTY_CELL_FILL = "rgba(58,51,44,0.04)";
 const PAPER = "#f7f5f0";
 const INK_SOFT = "#8b7f74";
 const RUST = "#8b4a2b";
