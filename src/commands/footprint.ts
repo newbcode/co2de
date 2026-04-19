@@ -122,6 +122,78 @@ function bucketIntensity(kg: number, maxKg: number): number {
   return Math.min(4, Math.max(0, Math.round(ratio * 4)));
 }
 
+/**
+ * Generate a realistic demo calendar: 52 weeks with activity spread
+ * across all 5 intensity levels, weekday-heavy, occasional spikes,
+ * some vacation gaps. Seeded PRNG → deterministic output each run.
+ */
+function buildDemoYear(): { days: DashboardDay[]; totalKg: number; sessionCount: number } {
+  const now = new Date();
+  const todayStr = now.toISOString().slice(0, 10);
+  const startBack = 52 * 7;
+  const start = new Date(now);
+  start.setDate(start.getDate() - startBack);
+  while (((start.getDay() + 6) % 7) !== 0) start.setDate(start.getDate() - 1);
+
+  let seed = 424242;
+  const rand = () => {
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return seed / 0x7fffffff;
+  };
+
+  const days: DashboardDay[] = [];
+  let totalKg = 0;
+  let sessionCount = 0;
+
+  // Pick 2 vacation stretches (1–2 weeks of zero activity)
+  const vacationStarts = [Math.floor(rand() * 150) + 40, Math.floor(rand() * 100) + 220];
+  const vacationLens = [7 + Math.floor(rand() * 7), 10 + Math.floor(rand() * 5)];
+
+  for (let i = 0; i <= startBack; i++) {
+    const d = new Date(start);
+    d.setDate(d.getDate() + i);
+    if (d > now) break;
+    const dateStr = d.toISOString().slice(0, 10);
+    const dow = (d.getDay() + 6) % 7;
+    const isWeekend = dow >= 5;
+
+    const inVacation =
+      (i >= vacationStarts[0] && i < vacationStarts[0] + vacationLens[0]) ||
+      (i >= vacationStarts[1] && i < vacationStarts[1] + vacationLens[1]);
+
+    // Activity probability. Weekdays heavy, weekends sparse, ramp up slightly near present.
+    const ramp = 0.8 + (i / startBack) * 0.4;
+    const baseProb = isWeekend ? 0.22 : 0.82;
+    const active = !inVacation && rand() < baseProb * ramp;
+
+    let kg = 0;
+    if (active) {
+      // Spread across 5 intensity tiers so the legend is fully
+      // populated in the rendering. Weighted lighter overall.
+      const r = rand();
+      if (r < 0.30) kg = 1 + rand() * 6;          // L0 (light)
+      else if (r < 0.58) kg = 6 + rand() * 18;    // L1
+      else if (r < 0.82) kg = 22 + rand() * 30;   // L2
+      else if (r < 0.95) kg = 50 + rand() * 40;   // L3
+      else kg = 90 + rand() * 120;                // L4 (extreme)
+    }
+
+    const sessions = kg > 0 ? Math.max(1, Math.round(kg / 10)) : 0;
+    totalKg += kg;
+    sessionCount += sessions;
+
+    days.push({
+      date: dateStr,
+      kg: Math.round(kg * 10) / 10,
+      sessions,
+      dayOfWeek: dow,
+      isToday: dateStr === todayStr,
+    });
+  }
+
+  return { days, totalKg, sessionCount };
+}
+
 function buildYearCalendar(sessions: DetailedSession[]): DashboardDay[] {
   const now = new Date();
   const todayStr = now.toISOString().slice(0, 10);
@@ -404,6 +476,7 @@ export async function footprintCommand(options: {
   image?: boolean;
   ascii?: boolean;
   style?: string;
+  demo?: boolean;
 } = {}): Promise<void> {
   const style: Style = ((): Style => {
     const s = (options.style ?? "footprint").toLowerCase();
@@ -412,31 +485,47 @@ export async function footprintCommand(options: {
     console.log(colors.dim(`  Valid: ${Object.keys(STYLES).join(" · ")}`));
     process.exit(1);
   })();
-  const { config } = createContext();
-  const projectPath = process.cwd();
-  const now = new Date();
-  const from = new Date(now);
-  from.setDate(from.getDate() - 365);
+  let days: DashboardDay[];
+  let totalKg: number;
+  let scopeLabel: string;
+  let sessionCount: number;
 
-  const sessions = options.all
-    ? collectAllSessions(from, now, config.region)
-    : collectProjectSessions(projectPath, from, now, config.region);
+  if (options.demo) {
+    // Spread-out sample data that exercises the full intensity ramp.
+    const demo = buildDemoYear();
+    days = demo.days;
+    totalKg = demo.totalKg;
+    sessionCount = demo.sessionCount;
+    scopeLabel = "demo · 52 weeks · all levels 0-4";
+  } else {
+    const { config } = createContext();
+    const projectPath = process.cwd();
+    const now = new Date();
+    const from = new Date(now);
+    from.setDate(from.getDate() - 365);
 
-  if (sessions.length === 0) {
-    console.log("");
-    if (options.all) {
-      console.log(colors.dim("  No sessions in the last year."));
-    } else {
-      console.log(colors.dim("  No sessions for this project in the last year."));
-      console.log(colors.dim("  Try  co2de footprint --all  for every project."));
+    const sessions = options.all
+      ? collectAllSessions(from, now, config.region)
+      : collectProjectSessions(projectPath, from, now, config.region);
+
+    if (sessions.length === 0) {
+      console.log("");
+      if (options.all) {
+        console.log(colors.dim("  No sessions in the last year."));
+      } else {
+        console.log(colors.dim("  No sessions for this project in the last year."));
+        console.log(colors.dim("  Try  co2de footprint --all  for every project."));
+      }
+      console.log(colors.dim("  Or  co2de footprint --demo  to see a filled example."));
+      console.log("");
+      return;
     }
-    console.log("");
-    return;
-  }
 
-  const totalKg = sessions.reduce((s, x) => s + x.co2_grams, 0) / 1000;
-  const scopeLabel = options.all ? "all projects" : (sessions[0]?.project ?? "project");
-  const days = buildYearCalendar(sessions);
+    totalKg = sessions.reduce((s, x) => s + x.co2_grams, 0) / 1000;
+    scopeLabel = options.all ? "all projects" : (sessions[0]?.project ?? "project");
+    sessionCount = sessions.length;
+    days = buildYearCalendar(sessions);
+  }
 
   // Mode resolution:
   //   --image  → force inline PNG (iTerm2/WezTerm/Kitty)
@@ -447,7 +536,7 @@ export async function footprintCommand(options: {
     const auto = detectImageCapability();
     const capability = auto === "none" ? "iterm2" : auto;
     try {
-      renderImage(days, totalKg, sessions.length, scopeLabel, capability);
+      renderImage(days, totalKg, sessionCount, scopeLabel, capability);
       return;
     } catch (err) {
       console.log(colors.dim(
@@ -456,8 +545,8 @@ export async function footprintCommand(options: {
     }
   }
   if (options.ascii) {
-    renderAscii(days, totalKg, sessions.length, scopeLabel);
+    renderAscii(days, totalKg, sessionCount, scopeLabel);
     return;
   }
-  renderEmoji(days, totalKg, sessions.length, scopeLabel, style);
+  renderEmoji(days, totalKg, sessionCount, scopeLabel, style);
 }

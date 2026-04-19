@@ -142,6 +142,7 @@ export function createProgram(): Command {
     .description("Year-view carbon footprint calendar in terminal (52 weeks × 7 days)")
     .option("--all", "All projects combined (default: current project only)")
     .option("--style <name>", "Visual style: footprint | paw | blocks | pollution", "footprint")
+    .option("--demo", "Use seeded demo data with activity across all intensity levels")
     .option("--image", "Force inline image (PNG via iTerm2/WezTerm/Kitty protocol)")
     .option("--ascii", "Force ASCII heatmap (skip emoji and image)")
     .action(footprintCommand);
