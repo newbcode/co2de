@@ -114,10 +114,10 @@ export function analyzeModelUsage(
 
   return {
     severity: savings > 1 ? "high" : "medium",
-    pattern: "Model over-selection",
-    description: `${simpleOnExpensive.length} of ${entries.length} responses were simple (<500 output tokens) but used an expensive model`,
+    pattern: "Short Opus turns",
+    description: `${simpleOnExpensive.length} of ${entries.length} responses were under 500 output tokens — likely acknowledgements or tool-only turns`,
     potential_savings_grams: savings,
-    suggestion: "Use Haiku or Sonnet for simple tasks (file reads, short answers)",
+    suggestion: "Check whether these short turns needed a reply at all — often a batched follow-up avoids the round-trip",
   };
 }
 

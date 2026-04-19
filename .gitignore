@@ -3,4 +3,6 @@ dist/
 *.tsbuildinfo
 .claude/
 co2de-report-*.html
+co2de-dashboard.html
+.co2de/
 .DS_Store

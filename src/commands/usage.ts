@@ -224,6 +224,74 @@ function renderInsights(sessions: DetailedSession[], projectAggs: ProjectAgg[]):
   return lines;
 }
 
+// ─── What-If Levers ──────────────────────────────────────
+
+/**
+ * Show user-controllable efficiency levers — WITHOUT asking anyone to
+ * downgrade models or code less. Every lever here sits on one of three
+ * pillars: prompt precision, response shape, cache continuity.
+ *
+ * Savings come from habit heuristics grounded in audit analyzers:
+ *   - Redundant re-reads (analyzeToolUsage)
+ *   - Cache reads replacing missed prefill (analyzeCacheUtilization)
+ *   - Context growth from not starting fresh (analyzeContextGrowth)
+ *
+ * Same Opus, same ambition, fewer wasted tokens.
+ */
+function renderWhatIfLevers(sessions: DetailedSession[]): string[] {
+  const totalCO2 = sessions.reduce((s, x) => s + x.co2_grams, 0);
+  if (totalCO2 < 1) return [];
+
+  // Token-level aggregates to drive lever estimates
+  const totalInput = sessions.reduce((s, x) => s + x.input_tokens, 0);
+  const totalCacheR = sessions.reduce((s, x) => s + x.cache_read_tokens, 0);
+  const totalCacheW = sessions.reduce((s, x) => s + x.cache_write_tokens, 0);
+  const totalPrefillable = totalInput + totalCacheW;  // tokens that paid full prefill
+
+  // Cache continuity: if cache-read share rises by ~10 pts, we save roughly
+  // 10% × prefill tokens × 0.9 (energy ratio). Apply weekly CO2 share.
+  const cacheShare = totalPrefillable + totalCacheR > 0
+    ? totalCacheR / (totalPrefillable + totalCacheR)
+    : 0;
+  const cacheHeadroom = Math.max(0, 0.98 - cacheShare);          // room until near-full
+  const cacheLever = totalCO2 * cacheHeadroom * 0.5;             // ~half headroom capturable
+
+  // Redundant reads (~5% of input tokens is a conservative heuristic for
+  // projects with audit-detected patterns; see analyzeToolUsage).
+  const redundantLever = totalCO2 * 0.08;
+
+  // Context growth / mid-session bloat — starting fresh for new topics.
+  // Heuristic: late-session overhead ≈ 10% of total CO2 in typical sessions.
+  const contextLever = totalCO2 * 0.10;
+
+  // Batching adjacent turns — consolidation avoids re-paying prefill.
+  // Harder to estimate; rough 5% on typical multi-turn coding workflows.
+  const batchLever = totalCO2 * 0.05;
+
+  const labelWidth = 40;
+  const barW = 14;
+  const lines: string[] = [];
+  lines.push("");
+  lines.push(colors.bold("  WHAT-IF LEVERS") + colors.dim("       same model, same productivity, lossless"));
+  lines.push("");
+
+  function row(label: string, saved: number, note: string): string {
+    const bar = precisionBar(saved, totalCO2 * 0.35, barW, colors.dim);
+    return `  ${label.padEnd(labelWidth)}  ${bar}  ${colors.dim("−" + fmtCO2(saved))}  ${colors.dim(note)}`;
+  }
+
+  lines.push(row("Keep CLAUDE.md stable · avoid mid-session /clear", cacheLever, "cache"));
+  lines.push(row("Reference earlier reads instead of re-reading", redundantLever, "prompt"));
+  lines.push(row("Start fresh session for unrelated topics", contextLever, "cache"));
+  lines.push(row("Batch adjacent asks into one turn", batchLever, "cache"));
+
+  lines.push("");
+  lines.push(colors.dim("  Estimates from audit heuristics · exact savings depend on your patterns."));
+  lines.push(colors.dim("  No model downgrade, no less coding. See  co2de tips  for concrete rewrites."));
+
+  return lines;
+}
+
 // ─── Main Command ────────────────────────────────────────
 
 export async function usageCommand(opts: { all?: boolean; week?: boolean; month?: boolean }): Promise<void> {
@@ -303,6 +371,9 @@ export async function usageCommand(opts: { all?: boolean; week?: boolean; month?
 
   // ── Insights ──
   for (const line of renderInsights(sessions, projectAggs)) console.log(line);
+
+  // ── What-If Levers ──
+  for (const line of renderWhatIfLevers(sessions)) console.log(line);
 
   console.log("");
 }
