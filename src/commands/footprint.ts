@@ -20,15 +20,19 @@ import type { DashboardDay } from "../dashboard/data.js";
  * --all aggregates every project.
  */
 
-// Warm bronze → rust ramp, calibrated for dark-terminal visibility.
+// Saturated warm ramp optimized for 👣 emoji contrast.
+// Apple's 👣 glyph is dark brown — we need backgrounds bright enough
+// for the emoji silhouette to read clearly. Each step lifts luminance
+// AND saturation so the intensity gradient is visible on both light
+// and dark terminals.
 const SOOT_RGB: [number, number, number][] = [
-  [164, 146, 120],
-  [139, 115, 82],
-  [112, 79, 53],
-  [82, 50, 32],
-  [201, 69, 31],
+  [215, 185, 140],   // warm sand — pale but clearly tinted
+  [210, 145, 80],    // amber
+  [220, 110, 50],    // burnt orange
+  [225, 75, 40],     // deep rust
+  [245, 55, 25],     // alarm red
 ];
-const RUST_TODAY: [number, number, number] = [215, 90, 40];
+const RUST_TODAY: [number, number, number] = [255, 100, 40];
 const EMPTY_BG: [number, number, number] = [45, 40, 36];   // very faint paper
 
 /** ANSI 24-bit background color wrap. */
