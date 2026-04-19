@@ -37,21 +37,64 @@ function bg(rgb: [number, number, number], inner: string): string {
   return `\x1b[48;2;${r};${g};${b}m${inner}\x1b[0m`;
 }
 
-// Emoji mode: 👣 (U+1F463) with a soot-colored background tile.
-// Width is fixed 2 cols because the emoji is always 2-wide; empty
-// cells emit "  " (two spaces) on the same background so columns align.
-const FOOTPRINT = "\uD83D\uDC63";       // 👣
+// Emoji cell width — all themed emojis are 2-column wide in virtually
+// every modern terminal font.
 const EMOJI_CELL_W = 2;
 
-function emojiCell(intensity: number): string {
-  return bg(SOOT_RGB[intensity], FOOTPRINT);
+export type Style = "footprint" | "paw" | "blocks" | "pollution";
+
+interface StyleDef {
+  describe: string;
+  cell(intensity: number): string;
+  today(): string;
+  legend(): string[];
 }
-function emojiToday(): string {
-  return bg(RUST_TODAY, FOOTPRINT);
+
+/**
+ * Visual themes. All themes preserve the pollution tone (no green, no
+ * sprout) and the 5-level intensity gradient.
+ *
+ *   footprint  👣 with soot-tinted backgrounds (default) — classic
+ *   paw        🐾 with soot-tinted backgrounds — animal spin
+ *   blocks     🟨🟧🟫🟥⬛ fully colored squares — max visibility
+ *   pollution  💨🌫️🏭🔥☠️ progression — narrative
+ */
+const STYLES: Record<Style, StyleDef> = {
+  footprint: {
+    describe: "Footprints (👣) on soot-tinted tiles",
+    cell: (i) => bg(SOOT_RGB[i], "\uD83D\uDC63"),
+    today: () => bg(RUST_TODAY, "\uD83D\uDC63"),
+    legend: () => [0, 1, 2, 3, 4].map((i) => bg(SOOT_RGB[i], "\uD83D\uDC63")),
+  },
+  paw: {
+    describe: "Paw prints (🐾) on soot-tinted tiles",
+    cell: (i) => bg(SOOT_RGB[i], "\uD83D\uDC3E"),
+    today: () => bg(RUST_TODAY, "\uD83D\uDC3E"),
+    legend: () => [0, 1, 2, 3, 4].map((i) => bg(SOOT_RGB[i], "\uD83D\uDC3E")),
+  },
+  blocks: {
+    // Colored-square emoji progression — fully saturated, highest
+    // visibility on any background because each cell IS its own color.
+    describe: "Colored squares — highest terminal contrast",
+    cell: (i) => ["\uD83D\uDFE8", "\uD83D\uDFE7", "\uD83D\uDFEB", "\uD83D\uDFE5", "\u2B1B"][i],
+    today: () => "\uD83D\uDD25",  // 🔥
+    legend: () => ["\uD83D\uDFE8", "\uD83D\uDFE7", "\uD83D\uDFEB", "\uD83D\uDFE5", "\u2B1B"],
+  },
+  pollution: {
+    describe: "Pollution progression: 💨 → 🌫 → 🏭 → 🔥 → ☠",
+    cell: (i) => ["\uD83D\uDCA8", "\uD83C\uDF2B\uFE0F", "\uD83C\uDFED", "\uD83D\uDD25", "\u2620\uFE0F"][i],
+    today: () => "\u2620\uFE0F",
+    legend: () => ["\uD83D\uDCA8", "\uD83C\uDF2B\uFE0F", "\uD83C\uDFED", "\uD83D\uDD25", "\u2620\uFE0F"],
+  },
+};
+
+function themeCell(style: StyleDef, intensity: number): string {
+  return style.cell(intensity);
 }
-// Empty cells stay fully transparent — active footprints pop, whole grid
-// doesn't become a solid colored tile block like GitHub's contributions.
-function emojiEmpty(): string {
+function themeToday(style: StyleDef): string {
+  return style.today();
+}
+function themeEmpty(): string {
   return " ".repeat(EMOJI_CELL_W);
 }
 
@@ -175,7 +218,9 @@ function renderEmoji(
   totalKg: number,
   sessionCount: number,
   scopeLabel: string,
+  styleName: Style,
 ): void {
+  const style = STYLES[styleName];
   if (days.length === 0) {
     console.log(colors.dim("  No footprint data for this scope."));
     return;
@@ -229,18 +274,18 @@ function renderEmoji(
     const cells = weeks.map((week) => {
       const day = week[r];
       if (!day) return "  ";
-      if (day.isToday) return emojiToday();
-      if (day.kg <= 0) return emojiEmpty();
-      return emojiCell(bucketIntensity(day.kg, maxKg));
+      if (day.isToday) return themeToday(style);
+      if (day.kg <= 0) return themeEmpty();
+      return themeCell(style, bucketIntensity(day.kg, maxKg));
     }).join("");
     console.log(`  ${colors.dim(DOW_LABELS[r])} ` + cells);
   }
 
   console.log("");
-  const legend = [0, 1, 2, 3, 4].map((i) => emojiCell(i)).join("");
+  const legend = style.legend().join("");
   console.log(
     `     ${colors.dim("lighter")}  ${legend}  ${colors.dim("darker")}   ` +
-    colors.dim("👣 = 1 day · blank = no trace"),
+    colors.dim(`${styleName} style · 1 cell = 1 day`),
   );
   console.log("");
 }
@@ -350,7 +395,15 @@ export async function footprintCommand(options: {
   all?: boolean;
   image?: boolean;
   ascii?: boolean;
+  style?: string;
 } = {}): Promise<void> {
+  const style: Style = ((): Style => {
+    const s = (options.style ?? "footprint").toLowerCase();
+    if (s in STYLES) return s as Style;
+    console.log(colors.red(`  Unknown style: "${s}"`));
+    console.log(colors.dim(`  Valid: ${Object.keys(STYLES).join(" · ")}`));
+    process.exit(1);
+  })();
   const { config } = createContext();
   const projectPath = process.cwd();
   const now = new Date();
@@ -398,5 +451,5 @@ export async function footprintCommand(options: {
     renderAscii(days, totalKg, sessions.length, scopeLabel);
     return;
   }
-  renderEmoji(days, totalKg, sessions.length, scopeLabel);
+  renderEmoji(days, totalKg, sessions.length, scopeLabel, style);
 }
