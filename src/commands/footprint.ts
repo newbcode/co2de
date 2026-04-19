@@ -20,19 +20,23 @@ import type { DashboardDay } from "../dashboard/data.js";
  * --all aggregates every project.
  */
 
-// Saturated warm ramp optimized for 👣 emoji contrast.
-// Apple's 👣 glyph is dark brown — we need backgrounds bright enough
-// for the emoji silhouette to read clearly. Each step lifts luminance
-// AND saturation so the intensity gradient is visible on both light
-// and dark terminals.
+// Soot accumulation ramp — paper white → charcoal → rust only at peak.
+// Semantics: carbon IS black; a "clean" day reads as near-white,
+// a heavy day as dark soot, an extreme day as industrial scarring.
+// This preserves an actual gradient (low/mid/high are visually
+// distinct) instead of painting every cell as alarm-red.
+//
+// Low-end stays bright enough that the dark-brown 👣 glyph still
+// reads clearly. Only level 4 is red — reserves alarm color for
+// the worst days. Matches the dashboard SVG palette.
 const SOOT_RGB: [number, number, number][] = [
-  [215, 185, 140],   // warm sand — pale but clearly tinted
-  [210, 145, 80],    // amber
-  [220, 110, 50],    // burnt orange
-  [225, 75, 40],     // deep rust
-  [245, 55, 25],     // alarm red
+  [232, 220, 190],   // clean paper cream
+  [190, 160, 120],   // warm tan
+  [135, 100, 70],    // mid brown (dust & soot mix)
+  [70, 50, 35],      // deep charcoal
+  [178, 62, 28],     // rust — industrial scarring (peak only)
 ];
-const RUST_TODAY: [number, number, number] = [255, 100, 40];
+const RUST_TODAY: [number, number, number] = [220, 90, 40];
 const EMPTY_BG: [number, number, number] = [45, 40, 36];   // very faint paper
 
 /** ANSI 24-bit background color wrap. */
