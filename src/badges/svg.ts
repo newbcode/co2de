@@ -11,7 +11,11 @@
  * logo support — not needed for co2de.
  */
 
-const FONT_FAMILY = 'Verdana,"DejaVu Sans",Geneva,sans-serif';
+// Match shields.io's exact font stack — no inner quotes. Embedding
+// "DejaVu Sans" in the attribute value would produce malformed XML
+// (an unescaped " closes the attribute), which made GitHub's SVG
+// preview reject the file as "Invalid image source".
+const FONT_FAMILY = "Verdana,Geneva,DejaVu Sans,sans-serif";
 const FONT_SIZE = 11;
 const BADGE_HEIGHT = 20;
 const TEXT_PAD_X = 6;
