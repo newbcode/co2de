@@ -20,6 +20,7 @@ import { traceCommand } from "./commands/trace.js";
 import { dashboardCommand } from "./commands/dashboard.js";
 import { serveCommand } from "./commands/serve.js";
 import { readmeCommand } from "./commands/readme.js";
+import { footprintCommand } from "./commands/footprint.js";
 
 export function createProgram(): Command {
   const program = new Command();
@@ -29,9 +30,13 @@ export function createProgram(): Command {
     .description("Track the carbon cost of vibe coding, one token at a time.")
     .version("0.1.0");
 
-  program
-    .option("--all", "Aggregate every project (default: current project only)")
-    .action(defaultCommand);
+  program.action(defaultCommand);
+
+  // Explicit subcommand alias so `co2de all` works as global-scope entry
+  // point without clashing with subcommand `--all` flags in commander v14.
+  program.command("all")
+    .description("Default view aggregated across every project (alias for co2de --all intent)")
+    .action(() => defaultCommand({ all: true }));
 
   program.command("why")
     .description("Explain WHY this much CO\u2082 was emitted — full calculation breakdown")
@@ -132,6 +137,15 @@ export function createProgram(): Command {
     .option("--show <level>", "Privacy: full | bucketed | weekly | disclosed", "bucketed")
     .option("--remove", "Remove the co2de block from README.md")
     .action(readmeCommand);
+
+  program.command("footprint")
+    .description("Year-view carbon footprint calendar in terminal (52 weeks × 7 days)")
+    .option("--all", "All projects combined (default: current project only)")
+    .option("--style <name>", "Visual style: footprint | paw | blocks | pollution", "footprint")
+    .option("--demo", "Use seeded demo data with activity across all intensity levels")
+    .option("--image", "Force inline image (PNG via iTerm2/WezTerm/Kitty protocol)")
+    .option("--ascii", "Force ASCII heatmap (skip emoji and image)")
+    .action(footprintCommand);
 
   return program;
 }

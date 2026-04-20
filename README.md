@@ -1,8 +1,12 @@
 # co2de
 
-<!-- co2de-badge:start -->
-[![co2de carbon badge](https://img.shields.io/badge/CO2-~14.77kg-yellow)](https://github.com/newbcode/co2de)
-<!-- co2de-badge:end -->
+<!-- co2de:start -->
+![CO₂](.co2de/pace.svg) ![lean](.co2de/lean.svg) ![stable](.co2de/stable.svg) ![concise](.co2de/concise.svg) ![carbon](.co2de/disclosed.svg)
+
+![carbon footprint](.co2de/calendar.svg)
+
+[carbon disclosure](.co2de/disclosure.html) · privacy `bucketed` · updated 2026-04-20
+<!-- co2de:end -->
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)](https://nodejs.org/)

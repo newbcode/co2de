@@ -4,5 +4,7 @@ dist/
 .claude/
 co2de-report-*.html
 co2de-dashboard.html
-.co2de/
 .DS_Store
+
+# .co2de/ IS committed so GitHub can render the README block.
+# Run `co2de readme` to refresh.
