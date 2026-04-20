@@ -1,11 +1,13 @@
 # co2de
 
 <!-- co2de:start -->
+> 🎭 **Demo data** — this README showcases co2de with synthetic activity so all intensity levels are visible. Run `co2de readme` on *your* repo for your real numbers.
+
 ![CO₂](.co2de/pace.svg) ![lean](.co2de/lean.svg) ![stable](.co2de/stable.svg) ![concise](.co2de/concise.svg) ![carbon](.co2de/disclosed.svg)
 
 ![carbon footprint](.co2de/calendar.svg)
 
-**demo data** · [carbon disclosure](.co2de/disclosure.html) · privacy `bucketed` · updated 2026-04-20
+[carbon disclosure](.co2de/disclosure.html) · privacy `bucketed` · updated 2026-04-20
 <!-- co2de:end -->
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)

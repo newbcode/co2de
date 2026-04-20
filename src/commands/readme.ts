@@ -292,6 +292,16 @@ export async function readmeCommand(options: ReadmeOptions): Promise<void> {
   }
 
   const blockParts: string[] = [];
+
+  // Demo banner — FIRST line of the block so visitors see the
+  // showcase disclaimer before eyes land on the pretty badges/calendar.
+  // GitHub renders `>` blockquotes with a vertical rule, visually
+  // separating the notice from normal README flow.
+  if (isDemo) {
+    blockParts.push(`> 🎭 **Demo data** — this README showcases co2de with synthetic activity so all intensity levels are visible. Run \`co2de readme\` on *your* repo for your real numbers.`);
+    blockParts.push("");
+  }
+
   blockParts.push(badgeRow.join(" "));
   if (hasCalendar) {
     blockParts.push("");
@@ -299,10 +309,7 @@ export async function readmeCommand(options: ReadmeOptions): Promise<void> {
   }
   blockParts.push("");
   const today = now.toISOString().slice(0, 10);
-  // Demo blocks label themselves — visitors should never confuse demo
-  // showcase numbers with the owner's real disclosure.
-  const demoTag = isDemo ? "**demo data** · " : "";
-  blockParts.push(`${demoTag}[carbon disclosure](.co2de/disclosure.html) · privacy \`${privacy}\` · updated ${today}`);
+  blockParts.push(`[carbon disclosure](.co2de/disclosure.html) · privacy \`${privacy}\` · updated ${today}`);
 
   const block = blockParts.join("\n");
   try {
