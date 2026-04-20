@@ -1,7 +1,7 @@
 # co2de
 
 <!-- co2de:start -->
-> 🎭 **Demo data** — this README showcases co2de with synthetic activity so all intensity levels are visible. Run `co2de readme` on *your* repo for your real numbers.
+> **Demo data** — this README showcases co2de with synthetic activity so all intensity levels are visible. Run `co2de readme` on *your* repo for your real numbers.
 
 ![CO₂](.co2de/pace.svg) ![lean](.co2de/lean.svg) ![stable](.co2de/stable.svg) ![concise](.co2de/concise.svg) ![carbon](.co2de/disclosed.svg)
 
@@ -56,6 +56,14 @@ co2de readme             # badges + calendar + disclosure block → README
 ```
 
 Every command defaults to your **current project** (the cwd). Add `--all` to aggregate across every project you've ever coded on.
+
+### See it in your terminal
+
+`co2de footprint --demo` renders the same 52-week calendar as the dashboard SVG — 👣 emoji tiles with soot-accumulation backgrounds (paper → charcoal → rust), all 5 intensity levels visible:
+
+![footprint terminal](examples/footprint-terminal.png)
+
+Detects iTerm2 / WezTerm / Kitty for pixel-perfect inline PNG via `--image`. Falls back to the 👣 emoji grid above on everything else. Force plain dots with `--ascii`. Three alternate styles (`--style paw | blocks | pollution`) trade the metaphor for maximum contrast.
 
 ## Join the carbon transparency movement
 
