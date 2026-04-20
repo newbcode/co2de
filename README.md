@@ -57,6 +57,14 @@ co2de readme             # badges + calendar + disclosure block → README
 
 Every command defaults to your **current project** (the cwd). Add `--all` to aggregate across every project you've ever coded on.
 
+### See it in your terminal
+
+`co2de footprint --demo` renders the same 52-week calendar as the dashboard SVG — 👣 emoji tiles with soot-accumulation backgrounds (paper → charcoal → rust), all 5 intensity levels visible:
+
+![footprint terminal](examples/footprint-terminal.png)
+
+Detects iTerm2 / WezTerm / Kitty for pixel-perfect inline PNG via `--image`. Falls back to the 👣 emoji grid above on everything else. Force plain dots with `--ascii`. Three alternate styles (`--style paw | blocks | pollution`) trade the metaphor for maximum contrast.
+
 ## Join the carbon transparency movement
 
 Add a self-hosted carbon disclosure block to your own repo — like the one at the top of this README.
