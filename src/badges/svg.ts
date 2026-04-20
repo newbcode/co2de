@@ -67,36 +67,25 @@ export const BADGE_COLORS = {
 
 /**
  * Generate a shields.io-style two-part badge as a self-contained SVG string.
+ *
+ * Rendered at 10× font size with per-element transform="scale(.1)" to
+ * match shields.io's exact structure. GitHub's SVG sandbox strips
+ * `transform` from group wrappers (<g transform=...>) in some paths,
+ * which made the previous group-wrapped version render as broken
+ * images on github.com. Per-<text> transforms survive the sanitizer.
  */
 export function svgBadge(label: string, value: string, valueColor: string): string {
   const labelW = Math.ceil(textWidth(label)) + TEXT_PAD_X * 2;
   const valueW = Math.ceil(textWidth(value)) + TEXT_PAD_X * 2;
   const totalW = labelW + valueW;
   const h = BADGE_HEIGHT;
+  const labelLen10 = Math.ceil(textWidth(label) * 10);
+  const valueLen10 = Math.ceil(textWidth(value) * 10);
+  const labelX10 = (labelW / 2) * 10;
+  const valueX10 = (labelW + valueW / 2) * 10;
 
-  // Text is painted twice — once as a black shadow beneath for contrast,
-  // then white on top. Matches the shields.io look for kerning stability.
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${h}" viewBox="0 0 ${totalW} ${h}" role="img" aria-label="${escapeXml(label)}: ${escapeXml(value)}">
-  <title>${escapeXml(label)}: ${escapeXml(value)}</title>
-  <linearGradient id="s" x2="0" y2="100%">
-    <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
-    <stop offset="1" stop-opacity=".1"/>
-  </linearGradient>
-  <clipPath id="r">
-    <rect width="${totalW}" height="${h}" rx="3" fill="#fff"/>
-  </clipPath>
-  <g clip-path="url(#r)">
-    <rect width="${labelW}" height="${h}" fill="${BADGE_COLORS.labelBg}"/>
-    <rect x="${labelW}" width="${valueW}" height="${h}" fill="${valueColor}"/>
-    <rect width="${totalW}" height="${h}" fill="url(#s)"/>
-  </g>
-  <g fill="#fff" text-anchor="middle" font-family="${FONT_FAMILY}" text-rendering="geometricPrecision" font-size="${FONT_SIZE * 10}" transform="scale(0.1)">
-    <text aria-hidden="true" x="${(labelW / 2) * 10}" y="150" fill="#010101" fill-opacity=".3">${escapeXml(label)}</text>
-    <text x="${(labelW / 2) * 10}" y="140" fill="#fff">${escapeXml(label)}</text>
-    <text aria-hidden="true" x="${(labelW + valueW / 2) * 10}" y="150" fill="#010101" fill-opacity=".3">${escapeXml(value)}</text>
-    <text x="${(labelW + valueW / 2) * 10}" y="140" fill="#fff">${escapeXml(value)}</text>
-  </g>
-</svg>`;
+  // Minified on a single line — matches shields.io's wire format.
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${h}" role="img" aria-label="${escapeXml(label)}: ${escapeXml(value)}"><title>${escapeXml(label)}: ${escapeXml(value)}</title><linearGradient id="s" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="r"><rect width="${totalW}" height="${h}" rx="3" fill="#fff"/></clipPath><g clip-path="url(#r)"><rect width="${labelW}" height="${h}" fill="${BADGE_COLORS.labelBg}"/><rect x="${labelW}" width="${valueW}" height="${h}" fill="${valueColor}"/><rect width="${totalW}" height="${h}" fill="url(#s)"/></g><g fill="#fff" text-anchor="middle" font-family="${FONT_FAMILY}" text-rendering="geometricPrecision" font-size="${FONT_SIZE * 10}"><text aria-hidden="true" x="${labelX10}" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="${labelLen10}">${escapeXml(label)}</text><text x="${labelX10}" y="140" transform="scale(.1)" textLength="${labelLen10}">${escapeXml(label)}</text><text aria-hidden="true" x="${valueX10}" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="${valueLen10}">${escapeXml(value)}</text><text x="${valueX10}" y="140" transform="scale(.1)" textLength="${valueLen10}">${escapeXml(value)}</text></g></svg>`;
 }
 
 /** Pick pace badge color by annualized emissions. */

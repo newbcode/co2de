@@ -1,7 +1,7 @@
 # co2de
 
 <!-- co2de:start -->
-![CO₂](.co2de/pace.svg) ![lean](.co2de/lean.svg) ![stable](.co2de/stable.svg) ![concise](.co2de/concise.svg) ![carbon](.co2de/disclosed.svg)
+![CO₂](.co2de/pace.svg) ![stable](.co2de/stable.svg) ![concise](.co2de/concise.svg) ![carbon](.co2de/disclosed.svg)
 
 ![carbon footprint](.co2de/calendar.svg)
 
