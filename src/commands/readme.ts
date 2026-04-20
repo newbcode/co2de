@@ -298,7 +298,7 @@ export async function readmeCommand(options: ReadmeOptions): Promise<void> {
   // GitHub renders `>` blockquotes with a vertical rule, visually
   // separating the notice from normal README flow.
   if (isDemo) {
-    blockParts.push(`> 🎭 **Demo data** — this README showcases co2de with synthetic activity so all intensity levels are visible. Run \`co2de readme\` on *your* repo for your real numbers.`);
+    blockParts.push(`> **Demo data** — this README showcases co2de with synthetic activity so all intensity levels are visible. Run \`co2de readme\` on *your* repo for your real numbers.`);
     blockParts.push("");
   }
 

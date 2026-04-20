@@ -1,7 +1,7 @@
 # co2de
 
 <!-- co2de:start -->
-> 🎭 **Demo data** — this README showcases co2de with synthetic activity so all intensity levels are visible. Run `co2de readme` on *your* repo for your real numbers.
+> **Demo data** — this README showcases co2de with synthetic activity so all intensity levels are visible. Run `co2de readme` on *your* repo for your real numbers.
 
 ![CO₂](.co2de/pace.svg) ![lean](.co2de/lean.svg) ![stable](.co2de/stable.svg) ![concise](.co2de/concise.svg) ![carbon](.co2de/disclosed.svg)
 
