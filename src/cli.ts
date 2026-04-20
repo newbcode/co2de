@@ -135,6 +135,7 @@ export function createProgram(): Command {
   program.command("readme")
     .description("One-shot: generate badges + calendar + disclosure page, inject block into README.md")
     .option("--show <level>", "Privacy: full | bucketed | weekly | disclosed", "bucketed")
+    .option("--demo", "Showcase mode — synthetic data, all badges qualify (for tool demos / marketing)")
     .option("--remove", "Remove the co2de block from README.md")
     .action(readmeCommand);
 

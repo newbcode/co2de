@@ -7,9 +7,11 @@ import { computePractice, countProjectLinesWritten, type PracticeBadge } from ".
 import { renderCalendarSVG, type PrivacyLevel } from "../badges/calendar-svg.js";
 
 const VALID_PRIVACY: readonly PrivacyLevel[] = ["full", "bucketed", "weekly", "disclosed"];
-import { buildDashboardData, pickFeaturedSession } from "../dashboard/data.js";
+import { buildDashboardData, pickFeaturedSession, type DashboardData } from "../dashboard/data.js";
+import { buildDemoDashboardData } from "../dashboard/demo-data.js";
 import { collectProjectSessions } from "../adapters/claude.js";
 import { renderDisclosureHTML } from "../disclosure/html.js";
+import type { PracticeBadge as PracticeBadgeType } from "../badges/practice.js";
 
 const BLOCK_START = "<!-- co2de:start -->";
 const BLOCK_END = "<!-- co2de:end -->";
@@ -17,6 +19,45 @@ const BLOCK_END = "<!-- co2de:end -->";
 interface ReadmeOptions {
   show?: PrivacyLevel;
   remove?: boolean;
+  demo?: boolean;
+}
+
+/**
+ * Fabricate a fully-qualifying practice badge set for demo mode.
+ * All four badges qualify so the showcase shows the tool at its best.
+ * Values are realistic (calibrated from typical well-practiced sessions).
+ */
+function demoPracticeBadges(): PracticeBadgeType[] {
+  return [
+    {
+      key: "lean",
+      qualifies: true,
+      label: "lean",
+      value: "3.2 g/line",
+      note: "CO₂ per line of code written via Write/Edit tools. Threshold: ≤ 10 g/line.",
+    },
+    {
+      key: "stable",
+      qualifies: true,
+      label: "stable",
+      value: "97%",
+      note: "Weighted cache-read ratio across sessions. Threshold: ≥ 90%.",
+    },
+    {
+      key: "concise",
+      qualifies: true,
+      label: "concise",
+      value: "420 tok/turn",
+      note: "Average new-input tokens per turn (excluding cache-read). Threshold: ≤ 1500.",
+    },
+    {
+      key: "disclosed",
+      qualifies: true,
+      label: "carbon",
+      value: "disclosed",
+      note: "The repository publishes co2de carbon metrics. Disclosure is the virtue — no score, no ranking.",
+    },
+  ];
 }
 
 function computeProjectPace(sessions: { co2_grams: number; timestamp: string }[]): number {
@@ -117,38 +158,73 @@ export async function readmeCommand(options: ReadmeOptions): Promise<void> {
   }
   const privacy = rawShow as PrivacyLevel;
   const { config, adapter } = createContext();
+  const now = new Date();
 
   // ── Data collection ──────────────────────────────────────
-  const sessions = await adapter.getProjectSessions(projectPath);
-  if (sessions.length === 0) {
-    console.log(colors.dim("  No CO\u2082 data for this project yet."));
-    console.log(colors.dim("  Run a Claude Code session in this directory first."));
-    return;
-  }
+  let pace: number;
+  let practice: PracticeBadgeType[];
+  let dashData: DashboardData | null;
+  let linesWritten = 0;
+  let isDemo = false;
 
-  const now = new Date();
-  const thirtyDaysAgo = Date.now() - 30 * 86400_000;
-  const recentSessions = sessions.filter((s) => new Date(s.timestamp).getTime() >= thirtyDaysAgo);
-  const entries = await collectAllEntries(adapter, recentSessions);
-  const linesWritten = countProjectLinesWritten(projectPath);
+  if (options.demo) {
+    // Showcase mode — synthetic data, all 5 intensity levels visible,
+    // all four badges qualify. Used on the tool's own marketing README
+    // where real data would be either scary (heavy repo) or
+    // underwhelming (new repo with 2 weeks of activity).
+    //
+    // Numbers are tuned moderate on purpose — a mid-sized active team
+    // pattern, not an enterprise monster. Pace lands in the yellow
+    // badge tier (~50–200 kg/yr) so visitors see "informative", not
+    // "alarming".
+    isDemo = true;
+    dashData = buildDemoDashboardData(config.region);
+    // Tune demo kg values down to show a moderate/team pattern —
+    // we scale the calendar since the dashboard's demo is calibrated
+    // for a heavier showcase scenario.
+    const DEMO_SCALE = 0.10;  // targets ~600 kg/yr (orange), not alarm-red
+    dashData = {
+      ...dashData,
+      calendar: dashData.calendar.map((d) => ({ ...d, kg: d.kg * DEMO_SCALE })),
+      calendarTotalKg: dashData.calendarTotalKg * DEMO_SCALE,
+      weeklyKg: dashData.weeklyKg * DEMO_SCALE,
+      annualKg: dashData.annualKg * DEMO_SCALE,
+    };
+    pace = dashData.weeklyKg * 52 * 1000;   // grams/yr → should land in orange
+    practice = demoPracticeBadges();
+    linesWritten = 36_500;                    // realistic "active repo" year
+  } else {
+    const sessions = await adapter.getProjectSessions(projectPath);
+    if (sessions.length === 0) {
+      console.log(colors.dim("  No CO\u2082 data for this project yet."));
+      console.log(colors.dim("  Run a Claude Code session in this directory first,"));
+      console.log(colors.dim("  or use  co2de readme --demo  to showcase the tool."));
+      return;
+    }
 
-  const pace = computeProjectPace(sessions);
-  const practice = computePractice({
-    sessions: recentSessions,
-    entries,
-    linesWritten,
-  });
+    const thirtyDaysAgo = Date.now() - 30 * 86400_000;
+    const recentSessions = sessions.filter((s) => new Date(s.timestamp).getTime() >= thirtyDaysAgo);
+    const entries = await collectAllEntries(adapter, recentSessions);
+    linesWritten = countProjectLinesWritten(projectPath);
 
-  // Calendar shows THIS project only — README is per-repo.
-  const from = new Date(now);
-  from.setDate(from.getDate() - 365);
-  const projectDetailed = collectProjectSessions(projectPath, from, now, config.region);
-  const featured = pickFeaturedSession(projectDetailed);
-  let dashData: ReturnType<typeof buildDashboardData> | null = null;
-  if (featured) {
-    const featuredTurns = await adapter.getSessionUsage(featured.sessionId);
-    if (featuredTurns.length > 0) {
-      dashData = buildDashboardData(projectDetailed, featured, featuredTurns, config.region);
+    pace = computeProjectPace(sessions);
+    practice = computePractice({
+      sessions: recentSessions,
+      entries,
+      linesWritten,
+    });
+
+    // Calendar shows THIS project only — README is per-repo.
+    const from = new Date(now);
+    from.setDate(from.getDate() - 365);
+    const projectDetailed = collectProjectSessions(projectPath, from, now, config.region);
+    const featured = pickFeaturedSession(projectDetailed);
+    dashData = null;
+    if (featured) {
+      const featuredTurns = await adapter.getSessionUsage(featured.sessionId);
+      if (featuredTurns.length > 0) {
+        dashData = buildDashboardData(projectDetailed, featured, featuredTurns, config.region);
+      }
     }
   }
 
@@ -223,7 +299,10 @@ export async function readmeCommand(options: ReadmeOptions): Promise<void> {
   }
   blockParts.push("");
   const today = now.toISOString().slice(0, 10);
-  blockParts.push(`[carbon disclosure](.co2de/disclosure.html) · privacy \`${privacy}\` · updated ${today}`);
+  // Demo blocks label themselves — visitors should never confuse demo
+  // showcase numbers with the owner's real disclosure.
+  const demoTag = isDemo ? "**demo data** · " : "";
+  blockParts.push(`${demoTag}[carbon disclosure](.co2de/disclosure.html) · privacy \`${privacy}\` · updated ${today}`);
 
   const block = blockParts.join("\n");
   try {
@@ -235,6 +314,7 @@ export async function readmeCommand(options: ReadmeOptions): Promise<void> {
 
   // ── Report ───────────────────────────────────────────────
   console.log(colors.bold("\n  co2de readme\n"));
+  if (isDemo) console.log(`  Source:   ${colors.yellow("demo data")} (all intensity levels visible, all badges qualify)`);
   console.log(`  Privacy:  ${privacy}`);
   console.log(`  Pace:     ${fmtBadgePace(pace)}`);
   console.log(`  Badges:   ${qualifying.map((q) => q.label).join(" · ") || "disclosed"}`);
