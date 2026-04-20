@@ -12,14 +12,17 @@
 [![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
 
-> Track the carbon cost of vibe coding, one token at a time.
+> The carbon cost of vibe coding — measured, disclosed, never ranked.
 
-**co2de** is a CLI tool that estimates and visualizes the carbon footprint of AI-assisted development. Every token processed by large language models consumes energy, which produces CO₂ emissions. co2de makes this invisible cost visible.
+Every AI coding session burns energy on someone else's GPUs. **co2de**
+makes that invisible cost visible — then lets you publish it on your repo
+like a nutrition label, so you're not alone in the honesty.
 
-- Reads token usage directly from Claude Code session files
-- Calculates energy with model-specific coefficients and cache discount
-- Converts to CO₂ using regional grid carbon intensity
-- No API keys, no network calls — everything runs locally
+- 🔒 **100% local** — reads `~/.claude/projects/*.jsonl` directly. No API key, no outbound network, no account, no telemetry.
+- 📉 **Same model, smarter use** — tips target *token waste*, never ask you to downgrade your model or code less.
+- 🏷️ **Publish with one command** — `co2de readme` injects a badge block + 52-week calendar + disclosure page into your README.
+- 🚫 **No ranking, no score** — threshold-based practice badges only. Disclosure itself is the virtue (like MIT license badge).
+- 🌫️ **Pollution tone, not greenwashing** — paper cream → charcoal → rust. No sprouts, no trees, no "you saved the planet" modals.
 
 ## Install
 
@@ -30,34 +33,58 @@ npm install && npm run build
 npm link
 ```
 
-Then initialize the statusline integration:
+Optional — wire the real-time CO₂ statusline into Claude Code:
 
 ```bash
 co2de init
 ```
 
-This patches your Claude Code statusline to show real-time CO₂:
-
 ![statusline](examples/statusline.png)
 
-## Quick Start
+## 60-second tour
 
 ```bash
-# Current session summary
-co2de
-
-# Detailed token usage — the main dashboard
-co2de usage
-
-# Why was this much CO₂ emitted? Full calculation breakdown
-co2de why
-
-# AI coding vs hand coding comparison
-co2de compare
-
-# Generate HTML carbon receipt
-co2de export
+co2de                    # this session + project + week, with annual pace
+co2de usage              # emission ledger — per-session breakdown
+co2de footprint --demo   # year-view calendar with sample data
+co2de tips               # concrete prompt rewrites that cut tokens
+co2de why                # full calculation pipeline for the latest session
+co2de dashboard          # interactive HTML — anatomy of a turn, what-ifs
+co2de readme             # badges + calendar + disclosure block → README
 ```
+
+Every command defaults to your **current project** (the cwd). Add `--all` to aggregate across every project you've ever coded on.
+
+## Join the carbon transparency movement
+
+Add a self-hosted carbon disclosure block to your own repo — like the one at the top of this README.
+
+```bash
+co2de readme
+```
+
+One command generates:
+
+| Asset | What | Privacy |
+|---|---|---|
+| `.co2de/pace.svg` | Annualized CO₂ badge (rust = >1 t/yr) | Shown |
+| `.co2de/{lean,stable,concise}.svg` | Threshold practice badges (qualified only) | Shown |
+| `.co2de/disclosed.svg` | "carbon disclosed" signature — always qualified | Shown |
+| `.co2de/calendar.svg` | 52-week × 7-day footprint calendar | 4 levels |
+| `.co2de/disclosure.html` | Nutrition-label public page (pace, stats, methodology) | 4 levels |
+| `README.md` block | Marker-idempotent injection | — |
+
+Pick how much to disclose:
+
+```bash
+co2de readme                   # daily bucketed (default) — 5-level color, no exact kg
+co2de readme --show weekly     # weekly aggregates only — stronger privacy
+co2de readme --show full       # daily + exact kg on hover
+co2de readme --show disclosed  # badges only, no calendar
+co2de readme --remove          # clean removal
+```
+
+The SVG assets are **self-hosted in your repo** — no shields.io call, no third-party tracking of who views your disclosure. Re-run any time to refresh numbers. Optional [`examples/github-action.yml`](examples/github-action.yml) bumps the "updated" line weekly.
 
 ## Output Examples
 
@@ -302,23 +329,49 @@ co2de export --month      # Past 30 days
 
 ## Commands
 
+### Everyday
+
 | Command | Description |
 |---------|-------------|
-| `co2de` | Session summary with weekly sparkline |
-| `co2de usage` | Detailed token usage — Emission Ledger (`--week`, `--month`, `--all`) |
-| `co2de log` | Session history with CO₂ bars |
+| `co2de` | Session summary + project + weekly sparkline + annual pace (add `--all` for global) |
+| `co2de all` | Shortcut for `co2de` in global scope (every project aggregated) |
+| `co2de usage` | Emission ledger — per-session detail + what-if levers |
+| `co2de trace [sessionId]` | Per-turn emission timeline + hot turns for a session |
+| `co2de log` | Git-style session history with CO₂ bars |
 | `co2de weekly` | Day-by-day breakdown |
-| `co2de why` | Full calculation pipeline + regional impact |
-| `co2de compare` | AI coding vs hand coding |
-| `co2de audit` | Efficiency audit — detect waste (`--week`) |
-| `co2de savings` | Carbon saved from cache reuse + lighter models |
+| `co2de why` | Full calculation pipeline for the latest session + regional impact |
+| `co2de compare` | AI coding vs hand coding — the core message |
+
+### Transparency movement
+
+| Command | Description |
+|---------|-------------|
+| `co2de readme` | **One-shot:** badges + calendar + disclosure page + README block. `--show <level>`, `--remove` |
+| `co2de badge` | Single-badge generator. `--type <pace\|lean\|stable\|concise\|disclosed\|all>`, `--save`, `--inject` |
+| `co2de footprint` | 52-week terminal calendar (👣 emoji default). `--style <name>`, `--demo`, `--image`, `--ascii`, `--all` |
+| `co2de dashboard` | Static interactive HTML — Soot Ledger, Anatomy of a Turn, Phantom Layer. `--all`, `--demo` |
+| `co2de serve` | Local server version (`:4869`) with live refresh. `--port`, `--all`, `--demo` |
+
+### Guidance
+
+| Command | Description |
+|---------|-------------|
+| `co2de tips [category]` | Prompt-craft playbook — concrete rewrites that cut tokens (prompt / response / cache) |
+| `co2de audit` | Efficiency audit — redundant reads, context bloat, short opus turns (`--week`) |
+| `co2de savings` | Carbon range audit (factual gap breakdown, no "you saved!" framing) |
+
+### Config & integration
+
+| Command | Description |
+|---------|-------------|
 | `co2de budget` | Daily carbon budget (`--set 50` or `--set 1.5kg`) |
-| `co2de heatmap` | 30-day GitHub-style calendar |
-| `co2de export` | HTML report (`--detail` for ESG/audit version) |
-| `co2de badge` | README carbon badge (`--inject` to auto-insert) |
-| `co2de config` | Configuration (`co2de config kr` to set region) |
-| `co2de init` | Statusline patch + initial setup |
+| `co2de heatmap` | 30-day terminal heatmap |
+| `co2de export` | ESG-style HTML report (`--detail` for audit version) |
+| `co2de config` | `co2de config kr` to set region · `co2de config set budget 50` |
+| `co2de init` | Claude Code statusline patch + initial setup |
 | `co2de statusline` | Single-line output for IDE integration |
+
+All commands respect the **per-project / `--all` scope policy**. Run `co2de <cmd> --help` for flag reference.
 
 ## How It Works
 
@@ -349,16 +402,15 @@ co2de config set budget 1.5kg  # Or in kg
 
 **Regions**: `global` (475), `us` (390), `eu` (230), `uk` (210), `de` (350), `fr` (55), `se` (25), `no` (10), `kr` (415), `jp` (450), `cn` (555), `in` (630), `au` (510), `ca` (120), `br` (75) — values in gCO₂/kWh.
 
-## Carbon Badge
+## Philosophy — why no ranking
 
-Add a carbon badge to your project README:
+co2de is **disclosure, not scoring**. The design is deliberate:
 
-```bash
-co2de badge              # Show markdown to copy
-co2de badge --inject     # Auto-insert into README.md
-```
-
-Re-run `co2de badge --inject` after sessions to update the value.
+- **No leaderboard.** Apples-to-apples carbon ranking across languages, stacks, and project scopes isn't possible. Any single score is game-able (split commits, bloat code, move work outside the agent).
+- **No moral licensing.** Classic "you saved X!" dashboards produce a well-documented rebound — users compensate by using more afterwards (Opower, Fraunhofer). We refuse that pattern.
+- **No guilt, no preaching.** Tips focus on **token waste** (prompt brevity, surgical edits, cache continuity), never on "use a lighter model" or "code less". Same Opus, same productivity, fewer wasted tokens.
+- **Publishing is the virtue.** Like the MIT license badge — the *act* of attaching the disclosure is itself the signal. Numbers inform; they don't rank.
+- **Privacy by design.** README/calendar can be bucketed or weekly-aggregated. Your exact daily kg is never leaked unless you pick `--show full`.
 
 ## Data Sources
 
@@ -376,20 +428,30 @@ These are **conservative upper-bound estimates**. Actual emissions are likely lo
 
 ```
 src/
-├── adapters/     Data source (Claude CLI JSONL files)
-├── engine/       Carbon calculator, savings tracker, analyzers
-├── commands/     CLI command handlers (14 commands)
-├── renderer/     Terminal output (charts, format utilities)
-├── export/       HTML report generation (receipt + detail)
-└── core/         Types, constants, configuration
+├── adapters/     JSONL reader (Claude Code session files)
+├── engine/       Carbon calculator · savings · pace · tips · audit analyzers
+├── commands/     CLI command handlers (23 commands)
+├── renderer/     Terminal output — charts, sparklines, format utilities
+├── badges/       Self-hosted SVG badges · footprint calendar SVG · practice qualifier
+├── dashboard/    Interactive HTML dashboard (Soot Ledger + Anatomy of a Turn)
+├── disclosure/   Public nutrition-label HTML page
+├── export/       ESG report generation (receipt + detail)
+└── core/         Types, constants, regional coefficients, config
 ```
+
+Three rendering surfaces, one calculation pipeline:
+- **Terminal** — 14 scoped commands + colored ASCII / emoji calendar
+- **Web dashboard** — `co2de dashboard` / `serve` — interactive exploration
+- **Public disclosure** — `co2de readme` — static SVG + HTML committed to repo
+
+68 tests (`npm test`), TypeScript-strict, zero runtime external services.
 
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
 
 ```bash
-git clone https://github.com/anthropics/co2de.git
+git clone https://github.com/newbcode/co2de.git
 cd co2de
 npm install
 npm run build
